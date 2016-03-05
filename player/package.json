@@ -3,11 +3,11 @@
   "version": "0.0.1",
   "description": "When DevOps meet Crossy Road <3",
   "scripts": {
-    "dev": "NODE_ENV=development webpack-dev-server --inline --hot --progress",
+    "dev": "npm run env NODE_ENV=development webpack-dev-server --inline --hot --progress",
     "start": "superstatic build -p ${PORT:-8080} --host 0.0.0.0 --gzip -c '{\"rewrites\": [{\"source\":\"**\",\"destination\":\"index.html\"}],\"headers\":[{\"source\":\"**\",\"headers\":[{\"key\":\"Cache-Control\",\"value\":\"max-age=86400\"}]}]}'",
     "prestart": "npm run build",
-    "build": "NODE_ENV=production webpack -p --progress",
-    "prebuild": "mkdir -p build",
+    "build": "npm run env NODE_ENV=production webpack -p --progress",
+    "prebuild": "rm -rf build && mkdir build",
     "test": "eslint src tests/**/*.js"
   },
   "keywords": [
