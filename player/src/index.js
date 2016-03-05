@@ -3,7 +3,6 @@ import { Provider } from 'react-redux';
 import store from './store';
 import App from './components/app';
 import './style';
-//import Playground from 'core/playground';
 import Game from './components/game';
 
 render((
@@ -14,5 +13,5 @@ render((
         <Provider store={store}>
 			<Game />
 		</Provider>
-    </div>
+	</div>
 ), document.body);
