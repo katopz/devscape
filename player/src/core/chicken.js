@@ -1,4 +1,4 @@
-import THREE from '../lib/three';
+import THREE from 'three';
 import Egg from '../core/egg';
 
 export default class Chicken {

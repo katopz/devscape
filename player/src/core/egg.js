@@ -1,4 +1,4 @@
-import THREE from '../lib/three';
+import THREE from 'three';
 
 export default class Egg {
     constructor(x, z, scale, scene) {

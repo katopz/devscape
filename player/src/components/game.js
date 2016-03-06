@@ -5,11 +5,11 @@ import { bindActions } from '../util';
 import reduce from '../reducers';
 import * as actions from '../actions';
 import TodoItem from './todo-item';
-import THREE from '../lib/three';
+import THREE from 'three';
 import LoadModels from '../core/loadmodel';
 import Chicken from '../core/chicken';
 import Egg from '../core/egg';
-//import MorphAnimMesh from '../lib/MorphAnimMesh';
+import Grid from '../core/grid';
 
 const TOUCH = 'Touch' in window && navigator.maxTouchPoints>1;
 const coords = e => ((e = e.touches && e.touches[0] || e), ({ x:e.pageX, y:e.pageY }));
@@ -124,7 +124,14 @@ class Scene extends Component {
 		this.renderObject();
 		this.renderLighting();
 		this.rerender();
+        
+        this.decorate();
 	}
+    
+    decorate() {
+        var size = 500, step = 50;
+        new Grid(size, step, this.scene)
+    }
 	
 	rerender() {
         let self = this;

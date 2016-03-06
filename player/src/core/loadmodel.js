@@ -1,4 +1,4 @@
-import THREE from '../lib/three';
+import THREE from 'three';
 //import MorphAnimMesh from '../lib/MorphAnimMesh';
 
 export default class LoadModels {
