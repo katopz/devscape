@@ -30,7 +30,7 @@ var Chicken = function () {
 			var z = self.position.z !== 0 ? self.position.z / self.scale : self.position.z;
 			var egg = new Egg(o.x + x, o.z + z, self.scale, self.scene);
 			egg.incubate().then(function (pos) {
-				new Chicken(pos.x, pos.z, self.scale, reference, self.scene, self.chickens);
+				//new Chicken(pos.x, pos.z, self.scale, reference, self.scene, self.chickens);
 			});
 		}, Math.floor(Math.random() * 7000) + 3000);
 

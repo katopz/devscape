@@ -1,4 +1,6 @@
-export class Egg {
+import THREE from '../lib/three';
+
+export default class Egg {
     constructor(x, z, scale, scene) {
         this.hatchtime = (Math.floor(Math.random() * 12) + 4) * 1000;
         var geometry = new THREE.BoxGeometry(15, 24, 15);

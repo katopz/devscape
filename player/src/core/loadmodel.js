@@ -1,4 +1,7 @@
-export class LoadModels {
+import THREE from '../lib/three';
+//import MorphAnimMesh from '../lib/MorphAnimMesh';
+
+export default class LoadModels {
     constructor() {
         this.foot1 = null;
         this.foot2 = null;

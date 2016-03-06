@@ -1,4 +1,7 @@
-export class Chicken {
+import THREE from '../lib/three';
+import Egg from '../core/egg';
+
+export default class Chicken {
     constructor(x, z, scale, reference, scene, chickens) {
         let self = this;
         this.scale = scale;
@@ -24,7 +27,7 @@ export class Chicken {
             let z = self.position.z !== 0 ? self.position.z / self.scale : self.position.z;
             let egg = new Egg(o.x + x, o.z + z, self.scale, self.scene);
             egg.incubate().then((pos) => {
-                new Chicken(pos.x, pos.z, self.scale, reference, self.scene, self.chickens)
+                //new Chicken(pos.x, pos.z, self.scale, reference, self.scene, self.chickens)
             });
         }, Math.floor(Math.random() * 7000) + 3000);
 
