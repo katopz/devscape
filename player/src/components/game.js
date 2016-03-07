@@ -16,40 +16,40 @@ const coords = e => ((e = e.touches && e.touches[0] || e), ({ x:e.pageX, y:e.pag
 
 @connect(reduce, bindActions(actions))
 export default class Game extends Component {
-	constructor() {
-        console.log("constructor");
-		super();
-		this.events = {
-			[TOUCH?'onTouchStart':'onMouseDown']: ::this.mouseDown,
-			[TOUCH?'onTouchMove':'onMouseMove']: ::this.mouseMove,
-			[TOUCH?'onTouchEnd':'onMouseUp']: ::this.mouseUp
-		};
-	}
-	
-	mouseDown(e) {
-		let { rotateX=0, rotateY=0 } = this.state;
-		this.downState = { rotateX, rotateY }
-		this.down = coords(e);
-                console.log("mouseDown");
-		e.preventDefault();
-	}
-	
-	mouseMove(e) {
-		if (!this.down) return;
-		let p = coords(e),
-			x = p.x - this.down.x,
-			y = p.y - this.down.y,
-			{ rotateX, rotateY } = this.downState;
-		rotateX += x/innerWidth - .5;
-		rotateY += y/innerHeight - .5;
-		this.setState({ rotateX, rotateY });
-	}
-	
-	mouseUp() {
-		this.downState = null;
-		this.down = null;
-                console.log("mouseUp");
-	}
+  constructor() {
+    console.log("constructor");
+    super();
+    this.events = {
+      [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown,
+      [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
+      [TOUCH ? 'onTouchEnd' : 'onMouseUp']: ::this.mouseUp
+    };
+  }
+
+  mouseDown(e) {
+    let { rotateX = 0, rotateY = 0 } = this.state;
+    this.downState = { rotateX, rotateY }
+    this.down = coords(e);
+    console.log("mouseDown");
+    e.preventDefault();
+  }
+
+  mouseMove(e) {
+    if (!this.down) return;
+    let p = coords(e),
+      x = p.x - this.down.x,
+      y = p.y - this.down.y,
+      { rotateX, rotateY } = this.downState;
+    rotateX += x / innerWidth - .5;
+    rotateY += y / innerHeight - .5;
+    this.setState({ rotateX, rotateY });
+  }
+
+  mouseUp() {
+    this.downState = null;
+    this.down = null;
+    console.log("mouseUp");
+  }
     
 	render({}, { zoom=1, rotateX=0, rotateY=0 }) {
 		return (
@@ -67,28 +67,28 @@ export default class Game extends Component {
 
 @connect(reduce, bindActions(actions))
 class Scene extends Component {
-        constructor() {
-        console.log("Scene.constructor");
-		super();
-		this.events = {
-			[TOUCH?'onTouchStart':'onMouseDown']: ::this.mouseDown
-		};
-	}
-        
-	shouldComponentUpdate() {
-		return false;
-	}
-	
-	componentWillReceiveProps() {
-		if (this.base) this.update();
-	}
-        
+  constructor() {
+    console.log("Scene.constructor");
+    super();
+    this.events = {
+      [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown
+    };
+  }
+
+  shouldComponentUpdate() {
+    return false;
+  }
+
+  componentWillReceiveProps() {
+    if (this.base) this.update();
+  }
+
   mouseDown(e) {
     console.log("*scene.mouseDown");
     e.preventDefault();
   }
 
-	//@debounce
+  //@debounce
   update() {
     console.log(this.props);
     let { events, zoom, rotateX, rotateY } = this.props;
@@ -98,10 +98,10 @@ class Scene extends Component {
     this.rerender();
   }
 
-	componentDidMount() {
-		setTimeout( () => this.setup(), 1);
-	}
-	
+  componentDidMount() {
+    setTimeout(() => this.setup(), 1);
+  }
+
   setup() {
     console.log("setup");
     let { width, height } = this.base.getBoundingClientRect();
@@ -122,7 +122,7 @@ class Scene extends Component {
     this.camera.position.set(-15, 10, 15);
     this.camera.lookAt(this.scene.position);
     */
-        
+
     this.camera = new THREE.PerspectiveCamera(
       40, window.innerWidth / window.innerHeight,
       1, 10000
@@ -141,12 +141,12 @@ class Scene extends Component {
 
     this.decorate();
   }
-    
+
   decorate() {
     var size = 500, step = 50;
     new Grid(size, step, this.scene)
   }
-	
+
   rerender() {
     let self = this;
     window.requestAnimationFrame(function () { self.rerender(); });
@@ -163,7 +163,7 @@ class Scene extends Component {
     this.renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
     this.renderer.render(this.scene, this.camera);
   }
-	
+
   renderObject() {
     var self = this;
     self.chickens = [];
@@ -179,7 +179,7 @@ class Scene extends Component {
       new Chicken(0, 0, 15, self.reference, self.scene, self.chickens);
     });
   }
-	
+
   renderLighting() {
     let light = new THREE.PointLight(0xFF0000, 1, 100);
     light.position.set(10, 0, 10);
