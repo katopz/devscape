@@ -6,6 +6,11 @@ import autoprefixer from 'autoprefixer';
 const ENV = process.env.NODE_ENV || 'development';
 
 module.exports = {
+  node: {
+    child_process: 'empty',
+    fs: 'empty'
+  },
+  
 	entry: './src/index.js',
 
 	output: {
@@ -73,7 +78,10 @@ module.exports = {
 		new webpack.DefinePlugin({
 			'process.env.NODE_ENV': JSON.stringify(ENV)
 		}),
-		new HtmlWebpackPlugin()
+		new HtmlWebpackPlugin({
+      title: 'Devscape',
+      template: 'index.ejs'
+    })
 	]).concat(ENV==='production' ? [
 		new webpack.optimize.OccurenceOrderPlugin(),
 		new webpack.optimize.UglifyJsPlugin({
