@@ -4,10 +4,10 @@
     {
       "title": "Services",
       "items": [
-        {"title": "Google Cloud", "percent" : 100},
-        {"title": "Amazon Cloud", "percent" : 46},
-        {"title": "Microsoft Cloud", "percent" : 20},
-        {"title": "IBM Cloud", "percent" : 7}
+        {"title": "Google Cloud", "percent" : 100, "trend" :100},
+        {"title": "Amazon Cloud", "percent" : 46, "trend" :46},
+        {"title": "Microsoft Cloud", "percent" : 20, "trend" :20},
+        {"title": "IBM Cloud", "percent" : 7, "trend" :7}
       ],
       "last_update" : "2016/03",
       "source": "https://www.google.com/trends/explore#q=Google%20Cloud%2C%20Amazon%20Cloud%2C%20IBM%20Cloud%2C%20Microsoft%20Cloud&cmpt=q&tz=Etc%2FGMT-7"

@@ -22,8 +22,8 @@
     {
       "title": "Version Control",
       "items": [
-        {"title": "GitHub", "percent" : 100},
-        {"title": "Bitbucket", "percent" : 16}
+        {"title": "GitHub", "percent" : 100, "trend" : 100},
+        {"title": "Bitbucket", "percent" : 16, "trend" : 16}
       ],
       "last_update" : "2016/03",
       "source": "https://www.google.com/trends/explore#q=%2Fm%2F04g0kcw%2C%20%2Fm%2F05mx6p6&cmpt=q&tz=Etc%2FGMT-7"
@@ -31,10 +31,10 @@
     {
       "title": "Continuous Integration",
       "items": [
-        {"title": "Travis-CI", "percent" : 91},
-        {"title": "Jenkins-CI", "percent" : 64},
-        {"title": "Circle-CI", "percent" : 33},
-        {"title": "Bamboo-CI", "percent" : 8}
+        {"title": "Travis-CI", "percent" : 91, "trend" : 91},
+        {"title": "Jenkins-CI", "percent" : 64, "trend" : 64},
+        {"title": "Circle-CI", "percent" : 33, "trend" : 33},
+        {"title": "Bamboo-CI", "percent" : 8, "trend" : 8}
       ],
       "last_update" : "2016/03",
       "source": "https://www.google.com/trends/explore#q=bamboo%20ci%2C%20jenkins%20ci%2C%20travis%20ci%2C%20circle%20ci&date=1%2F2016%2012m&cmpt=q&tz=Etc%2FGMT-7"

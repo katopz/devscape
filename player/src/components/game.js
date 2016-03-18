@@ -160,7 +160,7 @@ class Scene extends Component {
       var i = 0;
       json.items[0].items.forEach(function(item) {
         console.log(item);
-        var _box = new Box(self.scene, 0, i+=64, 64, 128*item.percent/100, randomColor({luminosity: 'bright', format: 'rgb'}));
+        var _box = new Box(self.scene, 0, i+=64, 64, 64 + 128*item.percent/100, randomColor({luminosity: 'bright', format: 'rgb'}));
       });
     });
   }
