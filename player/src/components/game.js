@@ -11,6 +11,8 @@ import Chicken from '../core/chicken';
 import Egg from '../core/egg';
 import Grid from '../core/grid';
 import Box from '../core/box';
+import xhrz from '../xhrz';
+import randomColor from 'randomcolor';
 
 const TOUCH = 'Touch' in window && navigator.maxTouchPoints>1;
 const coords = e => ((e = e.touches && e.touches[0] || e), ({ x:e.pageX, y:e.pageY }));
@@ -18,8 +20,9 @@ const coords = e => ((e = e.touches && e.touches[0] || e), ({ x:e.pageX, y:e.pag
 @connect(reduce, bindActions(actions))
 export default class Game extends Component {
   constructor() {
-    console.log("constructor");
     super();
+    
+    // input
     this.events = {
       [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown,
       [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
@@ -107,7 +110,7 @@ class Scene extends Component {
     console.log("setup");
     let { width, height } = this.base.getBoundingClientRect();
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setSize(800 * 2, 640 * 2);
+    this.renderer.setSize(800, 640);
     this.base.appendChild(this.renderer.domElement);
 
     this.clock = new THREE.Clock();
@@ -144,8 +147,22 @@ class Scene extends Component {
   }
 
   decorate() {
+    let self = this;
+    
+    // grid
     var size = 500, step = 50;
-    new Grid(size, step, this.scene)
+    new Grid(size, step, this.scene);
+    
+    // fetch data
+    xhrz.get("data/01_infras.json").then(function(jsonString) {
+      let json = JSON.parse(jsonString);
+      console.log(json);
+      var i = 0;
+      json.items[0].items.forEach(function(item) {
+        console.log(item);
+        var _box = new Box(self.scene, 0, i+=64, 64, 128*item.percent/100, randomColor({luminosity: 'bright', format: 'rgb'}));
+      });
+    });
   }
 
   rerender() {
@@ -166,10 +183,8 @@ class Scene extends Component {
   }
 
   renderObject() {
-    var self = this;
+    let self = this;
     self.chickens = [];
-    
-    var _box = new Box(self.scene, 0, 0, 64, 128, 0xFF0000);
     
     this.reference = new LoadModels();
     this.reference.load().then(function () {

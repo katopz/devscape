@@ -5,21 +5,11 @@ import { bindActions } from '../util';
 import reduce from '../reducers';
 import * as actions from '../actions';
 import TodoItem from './todo-item';
-import localforage from 'localforage';
 
 @connect(reduce, bindActions(actions))
 export default class App extends Component {
   constructor() {
     super();
-    
-    localforage.config({
-      name: 'Devscape'
-    });
-
-    localforage.setItem('key', {'foo':'bar2'});
-    localforage.getItem('key').then(function(value) {
-      console.log(value);
-    });
   }
 
   @bind
