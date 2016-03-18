@@ -10,6 +10,7 @@ import LoadModels from '../core/loadmodel';
 import Chicken from '../core/chicken';
 import Egg from '../core/egg';
 import Grid from '../core/grid';
+import Box from '../core/box';
 
 const TOUCH = 'Touch' in window && navigator.maxTouchPoints>1;
 const coords = e => ((e = e.touches && e.touches[0] || e), ({ x:e.pageX, y:e.pageY }));
@@ -167,13 +168,9 @@ class Scene extends Component {
   renderObject() {
     var self = this;
     self.chickens = [];
-
-    this.object = new THREE.Mesh(
-      new THREE.BoxGeometry(5, 5, 5),
-      new THREE.MeshLambertMaterial({ color: 0xFF0000 })
-      );
-    this.scene.add(this.object);
-
+    
+    var _box = new Box(self.scene, 0, 0, 64, 128, 0xFF0000);
+    
     this.reference = new LoadModels();
     this.reference.load().then(function () {
       new Chicken(0, 0, 15, self.reference, self.scene, self.chickens);

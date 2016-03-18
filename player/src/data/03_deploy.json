@@ -1,0 +1,33 @@
+{
+  "title": "Cloud",
+  "items": [
+    {
+      "title": "Services",
+      "items": [
+        {"title": "Google Cloud", "percent" : 100},
+        {"title": "Amazon Cloud", "percent" : 46},
+        {"title": "Microsoft Cloud", "percent" : 20},
+        {"title": "IBM Cloud", "percent" : 7}
+      ],
+      "last_update" : "2016/03",
+      "source": "https://www.google.com/trends/explore#q=Google%20Cloud%2C%20Amazon%20Cloud%2C%20IBM%20Cloud%2C%20Microsoft%20Cloud&cmpt=q&tz=Etc%2FGMT-7"
+    },
+    {
+      "title": "Database",
+      "items": [
+        {"title": "Oracle", "percent" : 1472.01},
+        {"title": "MySQL", "percent" : 1347.71},
+        {"title": "Microsoft SQL Server", "percent" : 1136.49},
+        {"title": "MongoDB", "percent" : 305.33},
+        {"title": "PostgreSQL", "percent" : 299.62},
+        {"title": "DB2", "percent" : 187.94},
+        {"title": "Microsoft Access", "percent" : 135.03},
+        {"title": "Cassandra", "percent" : 130.33},
+        {"title": "Redis", "percent" : 106.22},
+        {"title": "SQLite", "percent" : 105.77}
+      ],
+      "last_update" : "2016/03",
+      "source": "http://db-engines.com/en/ranking_trend"
+    }
+  ]
+}

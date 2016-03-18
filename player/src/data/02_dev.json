@@ -1,0 +1,43 @@
+{
+  "title": "Develop",
+  "items": [
+    {
+      "title": "Languages",
+      "items": [
+        {"title": "C", "percent" : 100.0},
+        {"title": "C++", "percent" : 98.4},
+        {"title": "Java", "percent" : 97.7},
+        {"title": "Python", "percent" : 97.6},
+        {"title": "Swift", "percent" : 88.1},
+        {"title": "C#", "percent" : 85.7},
+        {"title": "Ruby", "percent" : 85.2},
+        {"title": "JavaScript", "percent" : 84.9},
+        {"title": "PHP", "percent" : 84.7},
+        {"title": "R", "percent" : 83.1},
+        {"title": "Go", "percent" : 79.9}
+      ],
+      "last_update" : "2015/07",
+      "source": "http://spectrum.ieee.org/static/interactive-the-top-programming-languages-2015"
+    },
+    {
+      "title": "Version Control",
+      "items": [
+        {"title": "GitHub", "percent" : 100},
+        {"title": "Bitbucket", "percent" : 16}
+      ],
+      "last_update" : "2016/03",
+      "source": "https://www.google.com/trends/explore#q=%2Fm%2F04g0kcw%2C%20%2Fm%2F05mx6p6&cmpt=q&tz=Etc%2FGMT-7"
+    },
+    {
+      "title": "Continuous Integration",
+      "items": [
+        {"title": "Travis-CI", "percent" : 91},
+        {"title": "Jenkins-CI", "percent" : 64},
+        {"title": "Circle-CI", "percent" : 33},
+        {"title": "Bamboo-CI", "percent" : 8}
+      ],
+      "last_update" : "2016/03",
+      "source": "https://www.google.com/trends/explore#q=bamboo%20ci%2C%20jenkins%20ci%2C%20travis%20ci%2C%20circle%20ci&date=1%2F2016%2012m&cmpt=q&tz=Etc%2FGMT-7"
+    }
+  ]
+}

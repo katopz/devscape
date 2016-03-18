@@ -5,25 +5,12 @@ import { bindActions } from '../util';
 import reduce from '../reducers';
 import * as actions from '../actions';
 import TodoItem from './todo-item';
-//import LowlaDB from '../lib/lowladb';
 import localforage from 'localforage';
-import * as _octo from 'octokat';
 
 @connect(reduce, bindActions(actions))
 export default class App extends Component {
   constructor() {
     super();
-
-    /*
-    this.lowla = new LowlaDB({ datastore: 'Memory' });
-    this.todos = lowla.collection('mydb', 'todos');
-    render({ todos });
-    */
-    
-    this.octo = _octo.default();
-    this.octo.repos('katopz', 'devscape').fetch().then(function(repo) {
-      console.log(repo);
-    });
     
     localforage.config({
       name: 'Devscape'
@@ -40,31 +27,12 @@ export default class App extends Component {
     let { text } = this.state;
     this.setState({ text: '' });
     this.props.addTodo(text);
-
-    // db
-    /*
-    // db
-    var todo = {
-      _id: new Date().valueOf(),
-      title: text,
-      completed: false
-    };
-
-    todos.insert(todo).then(function(doc){
-      console.log(doc);
-    }, function(err){
-      console.log(err);
-    });
-    */
     return false;
   }
 
   @bind
   removeTodo(todo) {
     this.props.removeTodo(todo);
-
-    // db
-    //todos.remove({ _id: todo._id });
   }
 
   render({ todos }, { text }) {
