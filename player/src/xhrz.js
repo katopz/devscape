@@ -4,11 +4,11 @@ export default class xhrz {
   static get(url) {
     let self = this.self = this;
     self.localdata = localforage.createInstance({
-      name: "localdata"
+      name: 'localdata'
     });
 
-    return self.localdata.getItem("etag|" + url).then(function(etag) {
-      return self.localdata.getItem("data|" + url).then(function(data) {
+    return self.localdata.getItem('etag|' + url).then(function(etag) {
+      return self.localdata.getItem('data|' + url).then(function(data) {
         // valid data with etag
         return self._get(url, data ? etag : null);
       });
@@ -20,32 +20,36 @@ export default class xhrz {
     // Return a new promise.
     return new Promise(function(resolve, reject) {
       // Do the usual XHR stuff
-      let xhr = XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+      let xhr = XMLHttpRequest ? new XMLHttpRequest() : new window.ActiveXObject('Microsoft.XMLHTTP');
       xhr.open('GET', url);
-      etag && xhr.setRequestHeader("If-None-Match", etag);
+      if (etag) {
+        xhr.setRequestHeader('If-None-Match', etag);
+      }
 
       xhr.onload = function() {
         switch (xhr.status) {
           case 200:
             // set data with etag
-            self.localdata.setItem("data|" + url, xhr.response).then(function(data) {
-              
+            self.localdata.setItem('data|' + url, xhr.response).then(function(data) {
+
               // data fined now save etag 
               if (data) {
-                let etag = xhr.getResponseHeader("etag");
-                etag && self.localdata.setItem("etag|" + url, etag);
+                let etag = xhr.getResponseHeader('etag');
+                if (etag) {
+                  self.localdata.setItem('etag|' + url, etag);
+                }
               }
-              
+
               resolve(xhr.response);
             });
 
             break;
           case 304:
-            self.localdata.getItem("data|" + url).then(function(data) {
+            self.localdata.getItem('data|' + url).then(function(data) {
               // corrupted data
               if (!data) {
                 // clear corrupted etag
-                self.localdata.removeitem("etag|" + url);
+                self.localdata.removeitem('etag|' + url);
                 // retry without etag
                 self._get(url);
               }
@@ -54,14 +58,14 @@ export default class xhrz {
             });
             break;
           default:
-            reject(Error(xhr.statusText));
+            reject(new Error(xhr.statusText));
             break;
         }
       };
 
       // Handle network errors
       xhr.onerror = function() {
-        reject(Error("Network Error"));
+        reject(new Error('Network Error'));
       };
 
       // Make the request
