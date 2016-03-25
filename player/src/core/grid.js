@@ -2,7 +2,7 @@ import THREE from 'three';
 
 export default class Grid {
     constructor(size, step, scene) {
-        var size = 500, step = 50;
+        var size = 640, step = 64;
         var geometry = new THREE.Geometry();
         for (var i = - size; i <= size; i += step) {
             geometry.vertices.push(new THREE.Vector3(- size, 0, i));

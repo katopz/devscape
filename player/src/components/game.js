@@ -11,6 +11,7 @@ import Chicken from '../core/chicken';
 import Egg from '../core/egg';
 import Grid from '../core/grid';
 import Box from '../core/box';
+import Ground from '../core/ground';
 import Label from '../core/label';
 import xhrz from '../xhrz';
 import randomColor from 'randomcolor';
@@ -154,6 +155,9 @@ class Scene extends Component {
     var size = 500, step = 50;
     new Grid(size, step, this.scene);
     
+    // ground
+    let ground = new Ground(self.scene, 640, 640, 128);
+    
     // label-syle
     let LABEL_X = 64
     
@@ -168,7 +172,7 @@ class Scene extends Component {
         console.log(item.title);
         
         // chart
-        var box = new Box(self.scene, 0, i+=64, 64, 64 + 128*item.percent/100, randomColor({luminosity: 'bright', format: 'rgb'}));
+        let box = new Box(self.scene, 0, i+=64, 64, 64 + 128*item.percent/100, randomColor({luminosity: 'bright', format: 'rgb'}));
         
         // label
         let label = new Label(self.scene, item.title, LABEL_X, 0, i, "normal small-caps bold 56px arial", "black", "white");
