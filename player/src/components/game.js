@@ -154,6 +154,9 @@ class Scene extends Component {
     var size = 500, step = 50;
     new Grid(size, step, this.scene);
     
+    // label-syle
+    let LABEL_X = 64
+    
     // fetch data
     xhrz.get("data/01_infras.json").then(function(jsonString) {
       let json = JSON.parse(jsonString);
@@ -162,12 +165,19 @@ class Scene extends Component {
       // json
       var i = 0;
       json.items[0].items.forEach(function(item) {
-        console.log(item);
+        console.log(item.title);
+        
+        // chart
         var box = new Box(self.scene, 0, i+=64, 64, 64 + 128*item.percent/100, randomColor({luminosity: 'bright', format: 'rgb'}));
+        
+        // label
+        let label = new Label(self.scene, item.title, LABEL_X, 0, i, "normal small-caps bold 56px arial", "black", "white");
       });
       
       // label
-      let label = new Label(self.scene, "HELLO WORLD", 500, 100, 0, 100, "black", "yellow");
+      //let LABEL_X = 64
+      //let label = new Label(self.scene, "HELLO WORLD", LABEL_X, 0, 64, "normal small-caps bold 56px arial", "black", "yellow");
+      //let label2 = new Label(self.scene, "LOL", LABEL_X, 0, 0, "normal small-caps normal 56px verdana", "black", "yellow");
     });
   }
   
