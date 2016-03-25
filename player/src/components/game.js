@@ -11,6 +11,7 @@ import Chicken from '../core/chicken';
 import Egg from '../core/egg';
 import Grid from '../core/grid';
 import Box from '../core/box';
+import Label from '../core/label';
 import xhrz from '../xhrz';
 import randomColor from 'randomcolor';
 
@@ -157,13 +158,20 @@ class Scene extends Component {
     xhrz.get("data/01_infras.json").then(function(jsonString) {
       let json = JSON.parse(jsonString);
       console.log(json);
+      
+      // json
       var i = 0;
       json.items[0].items.forEach(function(item) {
         console.log(item);
-        var _box = new Box(self.scene, 0, i+=64, 64, 64 + 128*item.percent/100, randomColor({luminosity: 'bright', format: 'rgb'}));
+        var box = new Box(self.scene, 0, i+=64, 64, 64 + 128*item.percent/100, randomColor({luminosity: 'bright', format: 'rgb'}));
       });
+      
+      // label
+      let label = new Label(self.scene, "HELLO WORLD", 500, 100, 0, 100, "black", "yellow");
     });
   }
+  
+  // render ////////////////////////////
 
   rerender() {
     let self = this;
