@@ -234,22 +234,22 @@ class Scene extends Component {
     this.chickens && this.chickens.forEach(function(model) {
       model.group.children.forEach(function(mesh) {
         mesh.updateAnimation(1000 * delta);
-        //mesh.translateX(model.speed * delta)
+        mesh.translateX(model.speed * delta)
       });
     });
 
 
     // follow camera
-    if (this.chickens) {
-      //console.log(this.chickens[0].position);
+    if (this.chickens && this.chickens[0] && this.chickens[0].group.children[0]) {
+      //console.log(this.chickens[0].group.children[0].position);
       //this.camera.position.set(900, 900, 900);
-      //this.camera.target = this.chickens.position;
-      //this.camera.lookAt(this.camera.target);
+      var target = this.chickens[0].group.children[0].position.clone();
+      this.camera.target = target.multiplyScalar(15);
+      this.camera.lookAt(this.camera.target);
     }
 
     this.renderer.clear();
     this.renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-
 
     // render
     this.renderer.render(this.scene, this.camera);
@@ -283,6 +283,20 @@ class Scene extends Component {
     this.directionalLight.position.set(1, 0.75, 0.5).normalize();
     this.scene.add(this.directionalLight);
     */
+
+    var spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.set(100, 1000, 100);
+
+    spotLight.castShadow = true;
+
+    spotLight.shadowMapWidth = 1024;
+    spotLight.shadowMapHeight = 1024;
+
+    spotLight.shadowCameraNear = 500;
+    spotLight.shadowCameraFar = 4000;
+    spotLight.shadowCameraFov = 30;
+
+    this.scene.add(spotLight);
   }
 
   render() {
