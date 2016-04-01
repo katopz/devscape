@@ -109,6 +109,7 @@ class Scene extends Component {
   }
 
   setup() {
+    let self = this;
     console.log("setup");
     let { width, height } = this.base.getBoundingClientRect();
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -136,11 +137,13 @@ class Scene extends Component {
     this.camera.position.set(900, 900, 900);
     this.camera.target = new THREE.Vector3(0, 0, 0);
     this.camera.lookAt(this.camera.target);
+
     //this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     //this.controls.damping = 0.2;
     //this.controls.maxPolarAngle = Math.PI / 2;
     //this.controls.minDistance = 500;
 
+    this.onWindowResize(self);
     this.renderObject();
     this.renderLighting();
     this.rerender();
@@ -152,6 +155,12 @@ class Scene extends Component {
       'data/04_dist.json'
     ]);
     this.animate();
+    
+    // TODO : move to external?
+    
+    window.addEventListener( 'resize', function() {
+      self.onWindowResize(self);
+    }, false );
   }
 
   animate() {
@@ -165,9 +174,6 @@ class Scene extends Component {
   decorate(sections) {
     let self = this;
 
-    // grid
-    var size = 500, step = 50;
-    new Grid(size, step, self.scene);
 
     // ground
     let ground = new Ground(self.scene, 640, 640, 64);
@@ -187,14 +193,14 @@ class Scene extends Component {
     let self = this;
 
     // label style
-    let X0 = - sectionIndex * 512;
+    let X0 = - sectionIndex * 800;
     let LABEL_X = 64
     let group_x = 0;
     let group_h = 64;
     let item_h = 64;
 
     // header
-    let header_label = new Label(self.scene, sectionData.title, X0 + 64, 0, 96, "normal small-caps bold 64px arial", "black", "yellow", 64);
+    let header_label = new Label(self.scene, sectionData.title, X0 + 64, 0, 64, "normal small-caps bold 64px arial", "black", "yellow", 0);
 
     // section
     sectionData.group.forEach(function(group) {
@@ -211,14 +217,13 @@ class Scene extends Component {
         let box = new Box(self.scene, X0 - w / 2 + 64, item_x, w, 64 + 128 * item.percent / 100, item_h, randomColor({ luminosity: 'bright', format: 'rgb' }));
 
         // label
-        let item_label = new Label(self.scene, item.title, X0 + LABEL_X, 0, item_x, "normal small-caps bold 40px arial", "black", "white", 32);
+        let item_label = new Label(self.scene, item.title, X0 + LABEL_X, 0, item_x, "normal small-caps bold 40px arial", "grey", "", 32);
 
         j += 64;
-        console.log('[' + trend + ']' + item.title);
       });
 
       // group
-      let group_label = new Label(self.scene, group.title, X0 + LABEL_X, 0, -group_x, "normal small-caps bold 56px arial", "white", "black");
+      let group_label = new Label(self.scene, group.title, X0 + LABEL_X, 0, -group_x, "normal small-caps bold 56px arial", "white", "black", 0);
       group_x += items_h + group_h;
     });
   }
@@ -278,11 +283,10 @@ class Scene extends Component {
 
     this.ambientLight = new THREE.AmbientLight("#FFFFFF");
     this.scene.add(this.ambientLight);
-    /*
+    
     this.directionalLight = new THREE.DirectionalLight(0xff0000, 1);
     this.directionalLight.position.set(1, 0.75, 0.5).normalize();
     this.scene.add(this.directionalLight);
-    */
 
     var spotLight = new THREE.SpotLight(0xffffff);
     spotLight.position.set(100, 1000, 100);
@@ -303,5 +307,11 @@ class Scene extends Component {
     return (<main {...this.events } >
       <div class="scene"/>
     </main>)
+  }
+
+  onWindowResize(self) {
+    self.camera.aspect = window.innerWidth / window.innerHeight;
+    self.camera.updateProjectionMatrix();
+    self.renderer.setSize(window.innerWidth, window.innerHeight);
   }
 }
