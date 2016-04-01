@@ -1,8 +1,8 @@
 {
-  "title": "Develop",
+  "title": "DEVELOPMENT",
   "group": [
     {
-      "title": "Languages",
+      "title": "LANGUAGES",
       "items": [
         {
           "title": "Swift",
@@ -64,7 +64,7 @@
       "source": "http://spectrum.ieee.org/static/interactive-the-top-programming-languages-2015"
     },
     {
-      "title": "Version Control",
+      "title": "VERSION_CONTROL",
       "items": [
         {
           "title": "Bitbucket",
@@ -81,7 +81,7 @@
       "source": "https://www.google.com/trends/explore#q=%2Fm%2F04g0kcw%2C%20%2Fm%2F05mx6p6&cmpt=q&tz=Etc%2FGMT-7"
     },
     {
-      "title": "Continuous Integration",
+      "title": "CONTINUOUS_INTEGRATION",
       "items": [
         {
           "title": "Bamboo-CI",

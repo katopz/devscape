@@ -1,8 +1,8 @@
 {
-  "title": "Cloud",
+  "title": "CLOUD",
   "group": [
     {
-      "title": "Services",
+      "title": "SERVICES",
       "items": [
         {
           "title": "IBM Cloud",
@@ -29,7 +29,7 @@
       "source": "https://www.google.com/trends/explore#q=Google%20Cloud%2C%20Amazon%20Cloud%2C%20IBM%20Cloud%2C%20Microsoft%20Cloud&cmpt=q&tz=Etc%2FGMT-7"
     },
     {
-      "title": "Database",
+      "title": "DATABASE",
       "items": [
         {
           "title": "Redis",

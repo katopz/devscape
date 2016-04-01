@@ -2,7 +2,7 @@
   "title": "Distribution",
   "group": [
     {
-      "title": "Container",
+      "title": "CONTAINER",
       "items": [
         {"title": "Ansible", "percent" : 37, "trend" : 23},
         {"title": "Vagrant", "percent" : 39, "trend" : 27},
