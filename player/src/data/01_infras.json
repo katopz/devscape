@@ -4,36 +4,92 @@
     {
       "title": "BROWSER",
       "items": [
-        {"title": "Chrome", "percent" : 52.76, "trend" : 50},
-        {"title": "Safari", "percent" : 12.39, "trend" : 7},
-        {"title": "Internet Explorer", "percent" : 10.27, "trend" : 8},
-        {"title": "Firefox", "percent" : 9.3, "trend" : 23},
-        {"title": "Opera", "percent" : 5.66, "trend" : 5},
-        {"title": "Others", "percent" : 2.89, "trend" : 1}
+        {
+          "title": "Others",
+          "percent": 2.89,
+          "trend": 1
+        },
+        {
+          "title": "Opera",
+          "percent": 5.66,
+          "trend": 5
+        },
+        {
+          "title": "Internet Explorer",
+          "percent": 10.27,
+          "trend": 8
+        },
+        {
+          "title": "Safari",
+          "percent": 12.39,
+          "trend": 7
+        },
+        {
+          "title": "Firefox",
+          "percent": 9.3,
+          "trend": 23
+        },
+        {
+          "title": "Chrome",
+          "percent": 52.76,
+          "trend": 50
+        }
       ],
-      "last_update" : "2015/12",
+      "last_update": "2015/12",
       "source": "https://en.wikipedia.org/wiki/Usage_share_of_web_browsers"
     },
     {
       "title": "OPERATING SYSTEM",
       "items": [
-        {"title": "Android", "percent" : 48.61, "trend" : 72},
-        {"title": "Windows", "percent" : 14.00, "trend" : 22},
-        {"title": "iOS/OSX", "percent" : 11.04, "trend" : 13},
-        {"title": "Others", "percent" : 26.34, "trend" : 1}
+        {
+          "title": "Others",
+          "percent": 26.34,
+          "trend": 1
+        },
+        {
+          "title": "iOS/OSX",
+          "percent": 11.04,
+          "trend": 13
+        },
+        {
+          "title": "Windows",
+          "percent": 14,
+          "trend": 22
+        },
+        {
+          "title": "Android",
+          "percent": 48.61,
+          "trend": 72
+        }
       ],
-      "last_update" : "2014/12",
+      "last_update": "2014/12",
       "source": "https://en.wikipedia.org/wiki/Usage_share_of_operating_systems"
     },
     {
       "title": "WEB SERVER",
       "items": [
-        {"title": "Apache", "percent" : 32.80, "trend" : 12},
-        {"title": "IIS", "percent" : 29.83, "trend" : 8},
-        {"title": "Nginx", "percent" : 16.61, "trend" : 4},
-        {"title": "Others", "percent" : 18.55, "trend" : 1}
+        {
+          "title": "Others",
+          "percent": 18.55,
+          "trend": 1
+        },
+        {
+          "title": "Nginx",
+          "percent": 16.61,
+          "trend": 4
+        },
+        {
+          "title": "IIS",
+          "percent": 29.83,
+          "trend": 8
+        },
+        {
+          "title": "Apache",
+          "percent": 32.8,
+          "trend": 12
+        }
       ],
-      "last_update" : "2016/02",
+      "last_update": "2016/02",
       "source": "https://en.wikipedia.org/wiki/Web_server"
     }
   ]

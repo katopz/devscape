@@ -187,7 +187,8 @@ class Scene extends Component {
         var j = 0;
         var items_h = group.items.length * item_h;
 
-        group.items.reverse().forEach(function(item) {
+        group.items.forEach(function(item) {
+          
           // chart
           let trend = 64 * item.trend / 10;
           let w = (trend < 128) ? trend : 128;
