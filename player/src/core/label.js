@@ -5,7 +5,7 @@ export default class Label {
     // context.font="italic small-caps bold 12px arial";
     constructor(scene, text, x, y, z, font, color, backGroundColor, backgroundMargin) {
         
-        if (!backgroundMargin)
+        if (typeof(backgroundMargin) === 'undefined')
             backgroundMargin = 8;
         
         var canvas = document.createElement("canvas");

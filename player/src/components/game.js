@@ -145,7 +145,12 @@ class Scene extends Component {
     this.renderLighting();
     this.rerender();
 
-    this.decorate();
+    this.decorate([
+      'data/01_infras.json',
+      'data/02_dev.json',
+      'data/03_deploy.json',
+      'data/04_dist.json'
+    ]);
     this.animate();
   }
 
@@ -157,62 +162,64 @@ class Scene extends Component {
     }, Math.floor(Math.random() * 7000) + 3000);
   }
 
-  decorate() {
+  decorate(sections) {
     let self = this;
 
     // grid
     var size = 500, step = 50;
-    new Grid(size, step, this.scene);
+    new Grid(size, step, self.scene);
 
     // ground
-    let ground = new Ground(self.scene, 640, 640, 128);
+    let ground = new Ground(self.scene, 640, 640, 64);
 
-    // label-syle
+    // sections
+    var i = 0;
+    sections.forEach(function(sectionURL) {
+      // TODO : queue load
+      xhrz.get(sectionURL).then(function(jsonString) {
+        let json = JSON.parse(jsonString);
+        self.build(i++, json);
+      });
+    });
+  }
+
+  build(sectionIndex, sectionData) {
+    let self = this;
+
+    // label style
+    let X0 = - sectionIndex * 512;
     let LABEL_X = 64
+    let group_x = 0;
+    let group_h = 64;
+    let item_h = 64;
 
-    // fetch data
-    xhrz.get("data/01_infras.json").then(function(jsonString) {
-      let json = JSON.parse(jsonString);
-      console.log(json);
+    // header
+    let header_label = new Label(self.scene, sectionData.title, X0 + 64, 0, 96, "normal small-caps bold 64px arial", "black", "yellow", 64);
 
-      // json    
-      //var i = 0;
-      let group_x = 0;
-      let group_h = 64;
-      let item_h = 64;
+    // section
+    sectionData.group.forEach(function(group) {
 
-      json.group.forEach(function(group) {
+      var j = 0;
+      var items_h = group.items.length * item_h;
 
-        console.log('////' + group.title + '////' + group_x);
-        var j = 0;
-        var items_h = group.items.length * item_h;
+      group.items.forEach(function(item) {
 
-        group.items.forEach(function(item) {
-          
-          // chart
-          let trend = 64 * item.trend / 10;
-          let w = (trend < 128) ? trend : 128;
-          let item_x = -(group_x + group_h + j);
-          let box = new Box(self.scene, - w / 2 + 64, item_x, w, 64 + 128 * item.percent / 100, item_h, randomColor({ luminosity: 'bright', format: 'rgb' }));
+        // chart
+        let trend = 64 * item.trend / 10;
+        let w = (trend < 128) ? trend : 128;
+        let item_x = -(group_x + group_h + j);
+        let box = new Box(self.scene, X0 - w / 2 + 64, item_x, w, 64 + 128 * item.percent / 100, item_h, randomColor({ luminosity: 'bright', format: 'rgb' }));
 
-          // label
-          let label = new Label(self.scene, item.title, LABEL_X, 0, item_x, "normal small-caps bold 32px arial", "black", "white", 32);
+        // label
+        let item_label = new Label(self.scene, item.title, X0 + LABEL_X, 0, item_x, "normal small-caps bold 40px arial", "black", "white", 32);
 
-          j += 64;
-          console.log('[' + trend + ']' + item.title);
-        });
-
-        //console.log(i + '-' + j);
-
-        // group
-        let group_label = new Label(self.scene, group.title, LABEL_X, 0, -group_x, "normal small-caps bold 56px arial", "white", "black");
-        group_x += items_h + group_h;
+        j += 64;
+        console.log('[' + trend + ']' + item.title);
       });
 
-      // label
-      //let LABEL_X = 64
-      //let label = new Label(self.scene, "HELLO WORLD", LABEL_X, 0, 64, "normal small-caps bold 56px arial", "black", "yellow");
-      //let label2 = new Label(self.scene, "LOL", LABEL_X, 0, 0, "normal small-caps normal 56px verdana", "black", "yellow");
+      // group
+      let group_label = new Label(self.scene, group.title, X0 + LABEL_X, 0, -group_x, "normal small-caps bold 56px arial", "white", "black");
+      group_x += items_h + group_h;
     });
   }
 
