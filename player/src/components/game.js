@@ -98,8 +98,8 @@ class Scene extends Component {
   update() {
     console.log(this.props);
     let { events, zoom, rotateX, rotateY } = this.props;
-    this.object.rotation.y = rotateX * Math.PI;
-    this.object.rotation.z = - rotateY * Math.PI;
+    this.camera.rotation.y = rotateX * Math.PI;
+    this.camera.rotation.z = - rotateY * Math.PI;
     this.scene.scale.addScalar(zoom - this.scene.scale.x);
     this.rerender();
   }
@@ -187,7 +187,7 @@ class Scene extends Component {
         var j = 0;
         var items_h = group.items.length * item_h;
 
-        group.items.forEach(function(item) {
+        group.items.reverse().forEach(function(item) {
           // chart
           let trend = 64 * item.trend / 10;
           let w = (trend < 128) ? trend : 128;
@@ -226,7 +226,7 @@ class Scene extends Component {
     this.chickens && this.chickens.forEach(function(model) {
       model.group.children.forEach(function(mesh) {
         mesh.updateAnimation(1000 * delta);
-        //model.translateX(model.speed * delta)
+        //mesh.translateX(model.speed * delta)
       });
     });
 
@@ -268,11 +268,13 @@ class Scene extends Component {
 
     this.renderer.setClearColor(0x222222, 1);
 
-    this.ambientLight = new THREE.AmbientLight("#FFFFF3");
+    this.ambientLight = new THREE.AmbientLight("#FFFFFF");
     this.scene.add(this.ambientLight);
-    this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    /*
+    this.directionalLight = new THREE.DirectionalLight(0xff0000, 1);
     this.directionalLight.position.set(1, 0.75, 0.5).normalize();
     this.scene.add(this.directionalLight);
+    */
   }
 
   render() {
