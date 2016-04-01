@@ -2,10 +2,10 @@ import THREE from 'three';
 import Egg from '../core/egg';
 
 export default class Chicken {
-    constructor(x, z, scale, reference, scene, chickens) {
+    constructor(x, y, z, scale, reference, scene, chickens) {
         let self = this;
         this.scale = scale;
-        this.position = new THREE.Vector3(x, 0, z);
+        this.position = new THREE.Vector3(x, y, z);
         this.group = new THREE.Group();
         this.scene = scene;
         this.speed = 3;
@@ -14,10 +14,11 @@ export default class Chicken {
         this.body = reference.body.clone()
         this.foot1 = reference.foot1.clone()
         this.foot2 = reference.foot2.clone()
+        /*
         setInterval(() => {
             let randomness = Math.random();
             self.group.children.forEach(function (model) {
-                model.rotation.y += Math.PI / 2 * randomness;
+                //model.rotation.y += Math.PI / 2 * randomness;
             });
         }, Math.floor(Math.random() * 7000) + 3000);
 
@@ -30,6 +31,7 @@ export default class Chicken {
                 //new Chicken(pos.x, pos.z, self.scale, reference, self.scene, self.chickens)
             });
         }, Math.floor(Math.random() * 7000) + 3000);
+        */
 
         this.loadModel();
         this.chickens.push(this);
@@ -42,5 +44,14 @@ export default class Chicken {
         this.group.scale.set(this.scale, this.scale, this.scale);
         this.group.position.set(this.position.x, this.position.y, this.position.z);
         this.scene.add(this.group);
+    }
+
+    update() {
+        let self = this;
+        let randomness = Math.random();
+        self.group.children.forEach(function(model) {
+            console.log("update");
+            model.rotation.y += Math.PI / 2 * randomness;
+        });
     }
 }

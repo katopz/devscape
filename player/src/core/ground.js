@@ -6,7 +6,7 @@ export default class Ground {
         var material = new THREE.MeshBasicMaterial({ color: 0xcccccc });
         
         this.mesh = new THREE.Mesh(geometry, material)
-        this.mesh.position.set(0, -h/2 - 0.1, 0);
+        this.mesh.position.set(0, -h/2 - 0.2, 0);
         
         this.scene = scene;
         this.scene.add(this.mesh);

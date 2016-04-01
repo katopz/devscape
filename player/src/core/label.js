@@ -69,7 +69,7 @@ export default class Label {
         
         switch (textAlign) {
             case 'left':
-                mesh.position.x = x + canvas.width/2 - backgroundMargin * 4;
+                mesh.position.x = x + canvas.width/2;
                 break;            
             case 'center':
                 mesh.position.x = x;// - canvas.width;
