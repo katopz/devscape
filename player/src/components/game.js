@@ -270,6 +270,7 @@ class Scene extends Component {
   }
 
   renderLighting() {
+    /*
     let light = new THREE.PointLight(0xFF0000, 1, 100);
     light.position.set(10, 0, 10);
     this.scene.add(light);
@@ -277,19 +278,19 @@ class Scene extends Component {
     light = new THREE.PointLight(0xFF0000, 1, 50);
     light.position.set(-20, 15, 10);
     this.scene.add(light);
+    */
 
-    this.renderer.setClearColor(0x222222, 1);
+    //this.renderer.setClearColor(0x222222, 1);
 
     this.ambientLight = new THREE.AmbientLight("#FFFFFF");
     this.scene.add(this.ambientLight);
 
-    /*
-    this.directionalLight = new THREE.DirectionalLight(0xff0000, 1);
-    this.directionalLight.position.set(1, 0.75, 0.5).normalize();
+    this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.25);
+    this.directionalLight.position.set(0.382, 1, 0.382).normalize();
     this.scene.add(this.directionalLight);
-    */
 
-    var spotLight = new THREE.SpotLight(0xffffff);
+    /*
+    var spotLight = new THREE.SpotLight(0xff0000);
     spotLight.position.set(100, 1000, 100);
 
     spotLight.castShadow = true;
@@ -302,6 +303,7 @@ class Scene extends Component {
     spotLight.shadowCameraFov = 30;
 
     this.scene.add(spotLight);
+    */
   }
 
   render() {
