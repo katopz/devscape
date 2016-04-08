@@ -1,0 +1,15 @@
+{
+  "title": "DISTRIBUTION",
+  "group": [
+    {
+      "title": "CONTAINER",
+      "items": [
+        {"title": "Ansible", "percent" : 37, "trend" : 23},
+        {"title": "Vagrant", "percent" : 39, "trend" : 27},
+        {"title": "Docker", "percent" : 72, "trend" : 100}
+      ],
+      "last_update" : "2016/03",
+      "source": "https://www.google.com/trends/explore#q=%2Fm%2F0wkcjgj%2C%20%2Fm%2F0jwtqm2%2C%20%2Fm%2F03bxqg9&cmpt=q&tz=Etc%2FGMT-7"
+    }
+  ]
+}
