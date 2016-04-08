@@ -285,9 +285,17 @@ class Scene extends Component {
     this.ambientLight = new THREE.AmbientLight("#FFFFFF");
     this.scene.add(this.ambientLight);
 
-    this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.1);
-    this.directionalLight.position.set(0.382, 1, 0.382).normalize();
-    this.scene.add(this.directionalLight);
+    this.xLight = new THREE.DirectionalLight(0xffffff, 0.382);
+    this.xLight.position.set(1, 0, 0).normalize();
+    this.scene.add(this.xLight);
+    
+    this.yLight = new THREE.DirectionalLight(0xffffff, 0.1);
+    this.yLight.position.set(0, 1, 0).normalize();
+    this.scene.add(this.yLight);
+    
+    this.zLight = new THREE.DirectionalLight(0xff0000, 0.382);
+    this.zLight.position.set(0, 0, 1).normalize();
+    this.scene.add(this.zLight);
 
     /*
     var spotLight = new THREE.SpotLight(0x00ff00);

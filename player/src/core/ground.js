@@ -12,7 +12,7 @@ export default class Ground {
 
     _buildGrass(scene, x, z, w, d, h) {
         var geometry = new THREE.BoxGeometry(w, h, d);
-        var material = new THREE.MeshPhongMaterial({ color: 0xbef567 }); //, emissive: 0x000000, specular: 0x000000, shininess: 0});
+        var material = new THREE.MeshPhongMaterial({ color: 0xb0e65a }); //, emissive: 0x000000, specular: 0x000000, shininess: 0});
 
         this.mesh = new THREE.Mesh(geometry, material);
         this.mesh.position.set(x, -h / 2 - 0.3, z);
