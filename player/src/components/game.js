@@ -10,15 +10,23 @@ import LoadModels from '../core/loadmodel';
 import Chicken from '../core/chicken';
 import Egg from '../core/egg';
 import Grid from '../core/grid';
+import Box from '../core/box';
+import Ground from '../core/ground';
+import Label from '../core/label';
+import xhrz from '../xhrz';
+import randomColor from 'randomcolor';
 
-const TOUCH = 'Touch' in window && navigator.maxTouchPoints>1;
-const coords = e => ((e = e.touches && e.touches[0] || e), ({ x:e.pageX, y:e.pageY }));
+import OBJMTLLoader from '../lib/loaders/OBJMTLLoader';
+
+const TOUCH = 'Touch' in window && navigator.maxTouchPoints > 1;
+const coords = e => ((e = e.touches && e.touches[0] || e), ({ x: e.pageX, y: e.pageY }));
 
 @connect(reduce, bindActions(actions))
 export default class Game extends Component {
   constructor() {
-    console.log("constructor");
     super();
+
+    // input
     this.events = {
       [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown,
       [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
@@ -30,7 +38,7 @@ export default class Game extends Component {
     let { rotateX = 0, rotateY = 0 } = this.state;
     this.downState = { rotateX, rotateY }
     this.down = coords(e);
-    console.log("mouseDown");
+    console.log("mouseDown:" + downState);
     e.preventDefault();
   }
 
@@ -50,19 +58,19 @@ export default class Game extends Component {
     this.down = null;
     console.log("mouseUp");
   }
-    
-	render({}, { zoom=1, rotateX=0, rotateY=0 }) {
-		return (
-			<div id="game">
-				<header>
-					<input type="range" value={zoom} min="0" max="10" step="0.00001" onInput={ this.linkState('zoom') } />
-				</header>
-				<main {...this.events}>
-					<Scene {...{zoom, rotateX, rotateY}} />
-				</main>
-			</div>
-		);
-	}
+
+  render({}, { zoom = 1, rotateX = 0, rotateY = 0 }) {
+    return (
+      <div id="game">
+        <header>
+          <input type="range" value={zoom} min="0" max="10" step="0.00001" onInput={ this.linkState('zoom') } />
+        </header>
+        <main {...this.events}>
+          <Scene {...{ zoom, rotateX, rotateY }} />
+        </main>
+      </div>
+    );
+  }
 }
 
 @connect(reduce, bindActions(actions))
@@ -92,8 +100,8 @@ class Scene extends Component {
   update() {
     console.log(this.props);
     let { events, zoom, rotateX, rotateY } = this.props;
-    this.object.rotation.y = rotateX * Math.PI;
-    this.object.rotation.z = - rotateY * Math.PI;
+    this.camera.rotation.y = rotateX * Math.PI;
+    this.camera.rotation.z = - rotateY * Math.PI;
     this.scene.scale.addScalar(zoom - this.scene.scale.x);
     this.rerender();
   }
@@ -103,15 +111,16 @@ class Scene extends Component {
   }
 
   setup() {
+    let self = this;
     console.log("setup");
     let { width, height } = this.base.getBoundingClientRect();
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setSize(800 * 2, 640 * 2);
+    this.renderer.setSize(800, 640);
     this.base.appendChild(this.renderer.domElement);
 
     this.clock = new THREE.Clock();
     this.scene = new THREE.Scene();
-        
+
     /*
     this.camera = new THREE.PerspectiveCamera(
             35,         // FOV
@@ -126,61 +135,156 @@ class Scene extends Component {
     this.camera = new THREE.PerspectiveCamera(
       40, window.innerWidth / window.innerHeight,
       1, 10000
-      );
-    this.camera.position.set(900, 900, 900);
+    );
+    this.camera.position.set(900 * .382, 900, 900);
     this.camera.target = new THREE.Vector3(0, 0, 0);
     this.camera.lookAt(this.camera.target);
+
     //this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     //this.controls.damping = 0.2;
     //this.controls.maxPolarAngle = Math.PI / 2;
     //this.controls.minDistance = 500;
-		
+
+    this.onWindowResize(self);
     this.renderObject();
     this.renderLighting();
     this.rerender();
 
-    this.decorate();
+    this.decorate([
+      'data/01_infras.json',
+      'data/02_dev.json',
+      'data/03_deploy.json',
+      'data/04_dist.json'
+    ]);
+
+    // three
+    this.createTree(this.scene);
+
+    this.animate();
+
+    // TODO : move to external?
+
+    window.addEventListener('resize', function() {
+      self.onWindowResize(self);
+    }, false);
   }
 
-  decorate() {
-    var size = 500, step = 50;
-    new Grid(size, step, this.scene)
+  createTree(scene) {
+    var loader = new THREE.OBJMTLLoader();
+    loader.load('3d/Tree01.obj', '3d/Tree01.mtl', function(object) {
+      object.scale.set(20, 20, 20);
+      scene.add(object);
+    });
   }
+
+  animate() {
+    setInterval(() => {
+      this.chickens && this.chickens.forEach(function(chicken) {
+        chicken.update();
+      });
+    }, Math.floor(Math.random() * 7000) + 3000);
+  }
+
+  decorate(sections) {
+    let self = this;
+
+    // ground
+    let ground = new Ground(self.scene);
+
+    // sections
+    var i = 0;
+    sections.forEach(function(sectionURL) {
+      // TODO : queue load
+      xhrz.get(sectionURL).then(function(jsonString) {
+        let json = JSON.parse(jsonString);
+        self.build(i++, json);
+      });
+    });
+  }
+
+  build(sectionIndex, sectionData) {
+    let self = this;
+
+    // label style
+    let X0 = - sectionIndex * 800;
+    let LABEL_X = 64
+    let group_x = 0;
+    let group_h = 64;
+    let item_h = 64;
+
+    // header
+    let header_label = new Label(self.scene, sectionData.title, X0 + 64, 0, 64, "normal small-caps bold 64px arial", "black", "yellow", 0);
+
+    // section
+    sectionData.group.forEach(function(group) {
+
+      var j = 0;
+      var items_h = group.items.length * item_h;
+
+      group.items.forEach(function(item) {
+
+        // chart
+        let trend = 64 * item.trend / 10;
+        let w = (trend < 128) ? trend : 128;
+        let item_x = -(group_x + group_h + j);
+        let box = new Box(self.scene, X0 - w / 2 + 64, item_x, w, 64 + 128 * item.percent / 100, item_h, randomColor({ luminosity: 'bright', format: 'rgb' }));
+
+        // label
+        let item_label = new Label(self.scene, item.title, X0 + LABEL_X, 0, item_x, "normal small-caps bold 40px arial", "grey", "black", 32);
+
+        j += 64;
+      });
+
+      // group
+      let group_label = new Label(self.scene, group.title, X0 + LABEL_X, 0, -group_x, "normal small-caps bold 56px arial", "white", "black", 0);
+      group_x += items_h + group_h;
+    });
+  }
+
+  // render ////////////////////////////
 
   rerender() {
     let self = this;
-    window.requestAnimationFrame(function () { self.rerender(); });
+    window.requestAnimationFrame(function() { self.rerender(); });
 
     let delta = this.clock.getDelta();
 
-    this.chickens && this.chickens.forEach(function (model) {
-      model.group.children.forEach(function (mesh) {
+    this.chickens && this.chickens.forEach(function(model) {
+      model.group.children.forEach(function(mesh) {
         mesh.updateAnimation(1000 * delta);
         mesh.translateX(model.speed * delta)
       });
     });
+
+
+    // follow camera
+    if (this.chickens && this.chickens[0] && this.chickens[0].group.children[0]) {
+      //console.log(this.chickens[0].group.children[0].position);
+      //this.camera.position.set(900, 900, 900);
+      var target = this.chickens[0].group.children[0].position.clone();
+      this.camera.target = target.multiplyScalar(15);
+      //this.camera.lookAt(this.camera.target);
+    }
+
     this.renderer.clear();
     this.renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+
+    // render
     this.renderer.render(this.scene, this.camera);
   }
 
   renderObject() {
-    var self = this;
+    let self = this;
     self.chickens = [];
 
-    this.object = new THREE.Mesh(
-      new THREE.BoxGeometry(5, 5, 5),
-      new THREE.MeshLambertMaterial({ color: 0xFF0000 })
-      );
-    this.scene.add(this.object);
-
     this.reference = new LoadModels();
-    this.reference.load().then(function () {
-      new Chicken(0, 0, 15, self.reference, self.scene, self.chickens);
+    this.reference.load().then(function() {
+      new Chicken(200, 20, 200, 15, self.reference, self.scene, self.chickens);
     });
   }
 
   renderLighting() {
+    /*
     let light = new THREE.PointLight(0xFF0000, 1, 100);
     light.position.set(10, 0, 10);
     this.scene.add(light);
@@ -188,19 +292,51 @@ class Scene extends Component {
     light = new THREE.PointLight(0xFF0000, 1, 50);
     light.position.set(-20, 15, 10);
     this.scene.add(light);
+    */
 
-    this.renderer.setClearColor(0x222222, 1);
+    //this.renderer.setClearColor(0x222222, 1);
 
-    this.ambientLight = new THREE.AmbientLight("#FFFFF3");
+    this.ambientLight = new THREE.AmbientLight("#FFFFFF");
     this.scene.add(this.ambientLight);
-    this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    this.directionalLight.position.set(1, 0.75, 0.5).normalize();
-    this.scene.add(this.directionalLight);
+
+    this.xLight = new THREE.DirectionalLight(0xffffff, 0.382);
+    this.xLight.position.set(1, 0, 0).normalize();
+    this.scene.add(this.xLight);
+
+    this.yLight = new THREE.DirectionalLight(0xffffff, 0.1);
+    this.yLight.position.set(0, 1, 0).normalize();
+    this.scene.add(this.yLight);
+
+    this.zLight = new THREE.DirectionalLight(0xff0000, 0.382);
+    this.zLight.position.set(0, 0, 1).normalize();
+    this.scene.add(this.zLight);
+
+    /*
+    var spotLight = new THREE.SpotLight(0x00ff00);
+    spotLight.position.set(100, 1000, 100);
+
+    spotLight.castShadow = true;
+
+    spotLight.shadowMapWidth = 1024;
+    spotLight.shadowMapHeight = 1024;
+
+    spotLight.shadowCameraNear = 500;
+    spotLight.shadowCameraFar = 4000;
+    spotLight.shadowCameraFov = 30;
+
+    this.scene.add(spotLight);
+    */
   }
-        
+
   render() {
     return (<main {...this.events } >
       <div class="scene"/>
-      </main>)
+    </main>)
+  }
+
+  onWindowResize(self) {
+    self.camera.aspect = window.innerWidth / window.innerHeight;
+    self.camera.updateProjectionMatrix();
+    self.renderer.setSize(window.innerWidth, window.innerHeight);
   }
 }

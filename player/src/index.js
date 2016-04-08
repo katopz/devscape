@@ -6,12 +6,9 @@ import './style';
 import Game from './components/game';
 
 render((
-	<div id="outer">
-		<Provider store={store}>
-			<App />
-		</Provider>
-        <Provider store={store}>
-			<Game />
-		</Provider>
-	</div>
+  <div id="outer">
+    <Provider store={store}>
+      <Game />
+    </Provider>
+  </div>
 ), document.body);
