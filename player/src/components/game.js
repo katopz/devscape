@@ -16,6 +16,8 @@ import Label from '../core/label';
 import xhrz from '../xhrz';
 import randomColor from 'randomcolor';
 
+import OBJMTLLoader from '../lib/loaders/OBJMTLLoader';
+
 const TOUCH = 'Touch' in window && navigator.maxTouchPoints > 1;
 const coords = e => ((e = e.touches && e.touches[0] || e), ({ x: e.pageX, y: e.pageY }));
 
@@ -134,7 +136,7 @@ class Scene extends Component {
       40, window.innerWidth / window.innerHeight,
       1, 10000
     );
-    this.camera.position.set(900, 900, 900);
+    this.camera.position.set(900 * .382, 900, 900);
     this.camera.target = new THREE.Vector3(0, 0, 0);
     this.camera.lookAt(this.camera.target);
 
@@ -154,6 +156,10 @@ class Scene extends Component {
       'data/03_deploy.json',
       'data/04_dist.json'
     ]);
+
+    // three
+    this.createTree(this.scene);
+
     this.animate();
 
     // TODO : move to external?
@@ -161,6 +167,14 @@ class Scene extends Component {
     window.addEventListener('resize', function() {
       self.onWindowResize(self);
     }, false);
+  }
+
+  createTree(scene) {
+    var loader = new THREE.OBJMTLLoader();
+    loader.load('3d/Tree01.obj', '3d/Tree01.mtl', function(object) {
+      object.scale.set(20, 20, 20);
+      scene.add(object);
+    });
   }
 
   animate() {
@@ -249,7 +263,7 @@ class Scene extends Component {
       //this.camera.position.set(900, 900, 900);
       var target = this.chickens[0].group.children[0].position.clone();
       this.camera.target = target.multiplyScalar(15);
-      this.camera.lookAt(this.camera.target);
+      //this.camera.lookAt(this.camera.target);
     }
 
     this.renderer.clear();
@@ -288,11 +302,11 @@ class Scene extends Component {
     this.xLight = new THREE.DirectionalLight(0xffffff, 0.382);
     this.xLight.position.set(1, 0, 0).normalize();
     this.scene.add(this.xLight);
-    
+
     this.yLight = new THREE.DirectionalLight(0xffffff, 0.1);
     this.yLight.position.set(0, 1, 0).normalize();
     this.scene.add(this.yLight);
-    
+
     this.zLight = new THREE.DirectionalLight(0xff0000, 0.382);
     this.zLight.position.set(0, 0, 1).normalize();
     this.scene.add(this.zLight);
