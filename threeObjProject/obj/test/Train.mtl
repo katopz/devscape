@@ -10,7 +10,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd E:\Devscape\MasterBranch\devscape\threeObjProject\BlenderModels\TrainBodyUV.png
+map_Kd TrainBodyUV.png
 
 newmtl None
 Ns 0
@@ -19,4 +19,4 @@ Kd 0.8 0.8 0.8
 Ks 0.8 0.8 0.8
 d 1
 illum 2
-map_Kd E:\Devscape\MasterBranch\devscape\threeObjProject\BlenderModels\TrainRoofUV.png
+map_Kd TrainRoofUV.png
