@@ -241,7 +241,8 @@ class Scene extends Component {
         let trend = 64 * item.trend / 10;
         let w = (trend < 128) ? trend : 128;
         let item_x = -(group_x + group_h + j);
-        let box = new Box(self.scene, X0 - w / 2 + 64, item_x, w, 64 + 128 * item.percent / 100, item_h, randomColor({ luminosity: 'bright', format: 'rgb' }));
+        let h = 64 + 128 * item.percent / 100;
+        let box = new Box(self.scene, X0 - h / 2 + 64, item_x, h, w, item_h, randomColor({ luminosity: 'bright', format: 'rgb' }));
 
         // label
         let item_label = new Label(self.scene, item.title, X0 + LABEL_X, 0, item_x, "normal small-caps bold 40px arial", "grey", "black", 32);
