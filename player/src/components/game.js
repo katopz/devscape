@@ -25,38 +25,6 @@ const coords = e => ((e = e.touches && e.touches[0] || e), ({ x: e.pageX, y: e.p
 export default class Game extends Component {
   constructor() {
     super();
-
-    // input
-    this.events = {
-      [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown,
-      [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
-      [TOUCH ? 'onTouchEnd' : 'onMouseUp']: ::this.mouseUp
-    };
-  }
-
-  mouseDown(e) {
-    let { rotateX = 0, rotateY = 0 } = this.state;
-    this.downState = { rotateX, rotateY }
-    this.down = coords(e);
-    console.log("mouseDown:" + downState);
-    e.preventDefault();
-  }
-
-  mouseMove(e) {
-    if (!this.down) return;
-    let p = coords(e),
-      x = p.x - this.down.x,
-      y = p.y - this.down.y,
-      { rotateX, rotateY } = this.downState;
-    rotateX += x / innerWidth - .5;
-    rotateY += y / innerHeight - .5;
-    this.setState({ rotateX, rotateY });
-  }
-
-  mouseUp() {
-    this.downState = null;
-    this.down = null;
-    console.log("mouseUp");
   }
 
   render({}, { zoom = 1, rotateX = 0, rotateY = 0 }) {
@@ -78,8 +46,17 @@ class Scene extends Component {
   constructor() {
     console.log("Scene.constructor");
     super();
+
+    this.raycaster = new THREE.Raycaster();
+    this.mouse = new THREE.Vector2();
+    this.mouse_status = 'up';
+
+    this.targetRadian = 0;
+
     this.events = {
-      [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown
+      [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown,
+      [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
+      [TOUCH ? 'onTouchEnd' : 'onMouseUp']: ::this.mouseUp
     };
   }
 
@@ -92,13 +69,42 @@ class Scene extends Component {
   }
 
   mouseDown(e) {
-    console.log("*scene.mouseDown");
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+    //this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    //this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
+
+    //console.log('*scene.mouseDown : ' + this.mouse.x);
     e.preventDefault();
+
+    this.mouse_status = 'down';
+  }
+
+  mouseMove(e) {
+    if (this.mouse_status !== 'down')
+      return;
+
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+    this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
+
+    let radian = Math.atan2(this.mouse.y, this.mouse.x);
+    //let theta = radian * 180 / Math.PI;
+    //this.targetTheta = Math.floor(theta / 90) * 90;
+    //this.targetRadian = this.targetTheta * Math.PI / 180;
+    this.targetRadian = radian;
+
+    console.log(radian);
+  }
+
+  mouseUp(e) {
+    this.mouse_status = 'up';
   }
 
   //@debounce
   update() {
-    console.log(this.props);
+    //console.log(this.props);
     let { events, zoom, rotateX, rotateY } = this.props;
     this.camera.rotation.y = rotateX * Math.PI;
     this.camera.rotation.z = - rotateY * Math.PI;
@@ -112,7 +118,7 @@ class Scene extends Component {
 
   setup() {
     let self = this;
-    console.log("setup");
+    //console.log("setup");
     let { width, height } = this.base.getBoundingClientRect();
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(800, 640);
@@ -136,9 +142,8 @@ class Scene extends Component {
       40, window.innerWidth / window.innerHeight,
       1, 10000
     );
-    this.camera.position.set(900 * .382, 900, 900);
-    this.camera.target = new THREE.Vector3(0, 0, 0);
-    this.camera.lookAt(this.camera.target);
+    
+    this.letCameraFollowTarget(new THREE.Vector3(0, 0, 0));
 
     //this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     //this.controls.damping = 0.2;
@@ -168,11 +173,20 @@ class Scene extends Component {
       self.onWindowResize(self);
     }, false);
   }
+  
+  letCameraFollowTarget(target) {
+    this.camera.position.set(target.x, target.y, target.z);
+    this.camera.rotation.set(-38.2*2, 38.2*0.5, 38.2*0.5);
+    this.camera.translateZ(900);
+    this.camera.target = target;
+    this.camera.lookAt(this.camera.target);
+  }
 
   createTree(scene) {
     var loader = new THREE.OBJMTLLoader();
     loader.load('3d/Tree01.obj', '3d/Tree01.mtl', function(object) {
-      object.scale.set(20, 20, 20);
+      object.scale.set(15, 15, 15);
+      object.position.set(100, 0, 100);
       scene.add(object);
     });
   }
@@ -197,10 +211,8 @@ class Scene extends Component {
       // TODO : queue load
       papergirl.watch().onSync(function(jsonString, url, options) {
         let json = JSON.parse(jsonString);
-        console.log(options.index);
         self.build(options.index, json);
-      })
-        .request(sectionURL, { index: i++ });
+      }).request(sectionURL, { index: i++ });
     });
   }
 
@@ -249,23 +261,45 @@ class Scene extends Component {
     let self = this;
     window.requestAnimationFrame(function() { self.rerender(); });
 
+    /*
+    // update the picking ray with the camera and mouse position	
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    // calculate objects intersecting the picking ray
+    var intersects = this.raycaster.intersectObjects(this.scene.children);
+    console.log(intersects.length);
+    for (var i = 0; i < intersects.length; i++) {
+      //intersects[i].object.material.color.set(0xff0000);
+    }
+    */
+
     let delta = this.clock.getDelta();
 
-    this.chickens && this.chickens.forEach(function(model) {
-      model.group.children.forEach(function(mesh) {
-        mesh.updateAnimation(1000 * delta);
-        mesh.translateX(model.speed * delta)
-      });
-    });
+    this.chickens && this.chickens.forEach(function(chicken) {
 
+      //let randomness = Math.random();
+      //chicken.rotateY = Math.PI / 2 * randomness;//self.targetTheta;
+      if (self.mouse_status === 'down') {
+
+        // console.log("targetRadian : " + self.targetRadian);        
+        //chicken.rotateY = self.targetRadian;
+        chicken.rotateY = 0;
+        var f = chicken.speed * delta * chicken.scale;
+        chicken.group.position.set(chicken.group.position.x + f * Math.cos(self.targetRadian), 20, chicken.group.position.z - f * Math.sin(self.targetRadian));
+        chicken.rotateY = self.targetRadian;
+        chicken.group.children.forEach(function(mesh) {
+          mesh.updateAnimation(1000 * delta);
+          //mesh.translateX(chicken.speed * delta);
+        });
+      }
+    });
 
     // follow camera
     if (this.chickens && this.chickens[0] && this.chickens[0].group.children[0]) {
       //console.log(this.chickens[0].group.children[0].position);
       //this.camera.position.set(900, 900, 900);
-      var target = this.chickens[0].group.children[0].position.clone();
-      this.camera.target = target.multiplyScalar(15);
-      //this.camera.lookAt(this.camera.target);
+      //var target = this.chickens[0].group.children[0].position.clone();
+      var target = this.chickens[0].group.position.clone();
+      this.letCameraFollowTarget(target);
     }
 
     this.renderer.clear();
@@ -281,7 +315,7 @@ class Scene extends Component {
 
     this.reference = new LoadModels();
     this.reference.load().then(function() {
-      new Chicken(200, 20, 200, 15, self.reference, self.scene, self.chickens);
+      new Chicken(0, 20, 0, 15, self.reference, self.scene, self.chickens);
     });
   }
 

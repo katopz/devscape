@@ -8,7 +8,7 @@ export default class Chicken {
         this.position = new THREE.Vector3(x, y, z);
         this.group = new THREE.Group();
         this.scene = scene;
-        this.speed = 3;
+        this.speed = 6;
         this.rotation = 0;
         this.chickens = chickens;
         this.body = reference.body.clone()
@@ -46,12 +46,24 @@ export default class Chicken {
         this.scene.add(this.group);
     }
 
-    update() {
+    set rotateY(theta) {
         let self = this;
+        self.group.children.forEach(function(model) {
+            model.rotation.y = theta;
+        });
+    }
+
+    update() {
+
+    }
+
+    /*
+    update() {
         let randomness = Math.random();
         self.group.children.forEach(function(model) {
             console.log("update");
             model.rotation.y += Math.PI / 2 * randomness;
         });
     }
+    */
 }
