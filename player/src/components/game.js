@@ -13,7 +13,7 @@ import Grid from '../core/grid';
 import Box from '../core/box';
 import Ground from '../core/ground';
 import Label from '../core/label';
-import xhrz from '../xhrz';
+import papergirl from 'papergirl';
 import randomColor from 'randomcolor';
 
 import OBJMTLLoader from '../lib/loaders/OBJMTLLoader';
@@ -195,10 +195,12 @@ class Scene extends Component {
     var i = 0;
     sections.forEach(function(sectionURL) {
       // TODO : queue load
-      xhrz.get(sectionURL).then(function(jsonString) {
+      papergirl.watch().onSync(function(jsonString, url, options) {
         let json = JSON.parse(jsonString);
-        self.build(i++, json);
-      });
+        console.log(options.index);
+        self.build(options.index, json);
+      })
+        .request(sectionURL, { index: i++ });
     });
   }
 
