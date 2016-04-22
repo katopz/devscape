@@ -69,21 +69,44 @@ class Scene extends Component {
   }
 
   mouseDown(e) {
+    e.preventDefault();
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
     //this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     //this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
 
     //console.log('*scene.mouseDown : ' + this.mouse.x);
-    e.preventDefault();
-
+    
+        // update the picking ray with the camera and mouse position	
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    // calculate objects intersecting the picking ray
+    var intersects = this.raycaster.intersectObjects(this.scene.children);
+    //console.log(intersects.length);
+    for (var i = 0; i < intersects.length; i++) {
+      //intersects[i].object.material.color.set(0xff0000);
+      console.log(intersects[ 0 ].point.x, intersects[ 0 ].point.z);
+    }
+    
+    this.calculateTarget(e);
     this.mouse_status = 'down';
   }
 
   mouseMove(e) {
+    e.preventDefault();
+    
     if (this.mouse_status !== 'down')
       return;
 
+    this.calculateTarget(e);
+  }
+
+  mouseUp(e) {
+    e.preventDefault();
+    
+    this.mouse_status = 'up';
+  }
+  
+  calculateTarget(e) {
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
     this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -94,12 +117,6 @@ class Scene extends Component {
     //this.targetTheta = Math.floor(theta / 90) * 90;
     //this.targetRadian = this.targetTheta * Math.PI / 180;
     this.targetRadian = radian;
-
-    console.log(radian);
-  }
-
-  mouseUp(e) {
-    this.mouse_status = 'up';
   }
 
   //@debounce
@@ -177,7 +194,7 @@ class Scene extends Component {
   letCameraFollowTarget(target) {
     this.camera.position.set(target.x, target.y, target.z);
     this.camera.rotation.set(-38.2*2, 38.2*0.5, 38.2*0.5);
-    this.camera.translateZ(900);
+    this.camera.translateZ(1600);
     this.camera.target = target;
     this.camera.lookAt(this.camera.target);
   }
@@ -262,16 +279,7 @@ class Scene extends Component {
     let self = this;
     window.requestAnimationFrame(function() { self.rerender(); });
 
-    /*
-    // update the picking ray with the camera and mouse position	
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-    // calculate objects intersecting the picking ray
-    var intersects = this.raycaster.intersectObjects(this.scene.children);
-    console.log(intersects.length);
-    for (var i = 0; i < intersects.length; i++) {
-      //intersects[i].object.material.color.set(0xff0000);
-    }
-    */
+
 
     let delta = this.clock.getDelta();
 
@@ -344,7 +352,7 @@ class Scene extends Component {
     this.yLight.position.set(0, 1, 0).normalize();
     this.scene.add(this.yLight);
 
-    this.zLight = new THREE.DirectionalLight(0xff0000, 0.382);
+    this.zLight = new THREE.DirectionalLight(0x000000, 1);
     this.zLight.position.set(0, 0, 1).normalize();
     this.scene.add(this.zLight);
 
