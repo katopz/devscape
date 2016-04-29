@@ -33,9 +33,6 @@ export default class Game extends Component {
   render({}, { zoom = 1, rotateX = 0, rotationY = 0 }) {
     return (
       <div id="game">
-        <header>
-          <input type="range" value={zoom} min="0" max="10" step="0.00001" onInput={ this.linkState('zoom') } />
-        </header>
         <main {...this.events}>
           <Scene {...{ zoom, rotateX, rotationY }} />
         </main>
@@ -47,7 +44,6 @@ export default class Game extends Component {
 @connect(reduce, bindActions(actions))
 class Scene extends Component {
   constructor() {
-    console.log("Scene.constructor");
     super();
 
     this.raycaster = new THREE.Raycaster();
@@ -60,6 +56,13 @@ class Scene extends Component {
       [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown,
       [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
       [TOUCH ? 'onTouchEnd' : 'onMouseUp']: ::this.mouseUp
+    };
+    
+    window.oncontextmenu = function(event) {
+      console.log('oncontextmenu');
+      event.preventDefault();
+      event.stopPropagation();
+      return false;
     };
   }
 
