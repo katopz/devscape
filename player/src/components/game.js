@@ -176,14 +176,13 @@ class Scene extends Component {
     this.rerender();
 
     this.decorate([
-      'data/01_infras.json',
+      'data/01_client.json',
       'data/02_dev.json',
-      'data/03_deploy.json',
-      'data/04_dist.json'
+      'data/03_server.json'
     ]);
 
     // Forest
-    new Forest(this.scene, 1000, 1000, 10);
+    new Forest(this.scene, 640, 640, 10);
     this.traffic = new Traffic(this.scene);
 
     this.animate();
@@ -232,14 +231,16 @@ class Scene extends Component {
     let self = this;
 
     // label style
-    let X0 = - sectionIndex * 800;
+    let X0 = - sectionIndex * 800 - 100;
+    let Z0 = 180;
     let LABEL_X = 64
     let group_x = 0;
     let group_h = 64;
     let item_h = 64;
 
+    self.scene
     // header
-    let header_label = new Label(self.scene, sectionData.title, X0 + 64, 0, 64, "normal small-caps bold 64px arial", "black", "yellow", 0);
+    let header_label = new Label(self.scene, sectionData.title, X0 + 64, 0, Z0 + 64, "normal small-caps bold 64px arial", "black", "yellow", 0);
 
     // section
     sectionData.group.forEach(function(group) {
@@ -252,7 +253,7 @@ class Scene extends Component {
         // chart
         let trend = 64 * item.trend / 10;
         let w = (trend < 128) ? trend : 128;
-        let item_x = -(group_x + group_h + j);
+        let item_x = Z0 -(group_x + group_h + j);
         let h = 64 + 128 * item.percent / 100;
         let box = new Box(self.scene, X0 - h / 2 + 64, item_x, h, w, item_h, randomColor({ luminosity: 'bright', format: 'rgb' }));
 
@@ -263,7 +264,7 @@ class Scene extends Component {
       });
 
       // group
-      let group_label = new Label(self.scene, group.title, X0 + LABEL_X, 0, -group_x, "normal small-caps bold 56px arial", "white", "black", 0);
+      let group_label = new Label(self.scene, group.title, X0 + LABEL_X, 0, Z0-group_x, "normal small-caps bold 56px arial", "white", "black", 0);
       group_x += items_h + group_h;
     });
   }

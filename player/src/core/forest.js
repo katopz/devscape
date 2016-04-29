@@ -5,6 +5,7 @@ export default class Forest {
     constructor(scene, w, h, dens) {
         
         let self = this;
+        self.Z0 = 640; 
         
         var loader = new THREE.OBJMTLLoader();
         loader.load('3d/Tree01.obj', '3d/Tree01.mtl', function(tree) {
@@ -15,7 +16,7 @@ export default class Forest {
                 //for (var j = 0; j < h; i += h/sh) {
                 var mesh = tree.clone();
                 //mesh.scale = tree.scale + Math.random() * 2;
-                mesh.position.set(Math.random() * w - w / 2, 0, Math.random() * h - h / 2);
+                mesh.position.set(Math.random() * 2 * w -  2* w, 0, self.Z0 + Math.random() * h/2);
                 scene.add(mesh);
                 //}
             }
