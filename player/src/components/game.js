@@ -15,6 +15,7 @@ import Ground from '../core/ground';
 import Label from '../core/label';
 import papergirl from 'papergirl';
 import randomColor from 'randomcolor';
+import Forest from '../core/forest';
 
 import OBJMTLLoader from '../lib/loaders/OBJMTLLoader';
 
@@ -179,8 +180,8 @@ class Scene extends Component {
       'data/04_dist.json'
     ]);
 
-    // three
-    this.createTree(this.scene);
+    // Forest
+    new Forest(this.scene, 1000, 1000, 10);
 
     this.animate();
 
@@ -197,15 +198,6 @@ class Scene extends Component {
     this.camera.translateZ(1600);
     this.camera.target = target;
     this.camera.lookAt(this.camera.target);
-  }
-
-  createTree(scene) {
-    var loader = new THREE.OBJMTLLoader();
-    loader.load('3d/Tree01.obj', '3d/Tree01.mtl', function(object) {
-      object.scale.set(15, 15, 15);
-      object.position.set(100, 0, 100);
-      scene.add(object);
-    });
   }
 
   animate() {
@@ -348,11 +340,11 @@ class Scene extends Component {
     this.xLight.position.set(1, 0, 0).normalize();
     this.scene.add(this.xLight);
 
-    this.yLight = new THREE.DirectionalLight(0xffffff, 0.1);
+    this.yLight = new THREE.DirectionalLight(0xffffff, 0.2);
     this.yLight.position.set(0, 1, 0).normalize();
     this.scene.add(this.yLight);
 
-    this.zLight = new THREE.DirectionalLight(0x000000, 1);
+    this.zLight = new THREE.DirectionalLight(0x111111, 0.1);
     this.zLight.position.set(0, 0, 1).normalize();
     this.scene.add(this.zLight);
 
