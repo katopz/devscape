@@ -1,5 +1,5 @@
 {
-  "title": "DEPLOYMENT",
+  "title": "SERVER",
   "group": [
     {
       "title": "SERVICES",
@@ -84,6 +84,33 @@
       ],
       "last_update": "2016/03",
       "source": "http://db-engines.com/en/ranking_trend"
+    },
+    {
+      "title": "WEB SERVER",
+      "items": [
+        {
+          "title": "Others",
+          "percent": 18.55,
+          "trend": 1
+        },
+        {
+          "title": "Nginx",
+          "percent": 16.61,
+          "trend": 4
+        },
+        {
+          "title": "IIS",
+          "percent": 29.83,
+          "trend": 8
+        },
+        {
+          "title": "Apache",
+          "percent": 32.8,
+          "trend": 12
+        }
+      ],
+      "last_update": "2016/02",
+      "source": "https://en.wikipedia.org/wiki/Web_server"
     }
   ]
 }

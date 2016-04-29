@@ -13,8 +13,11 @@ import Grid from '../core/grid';
 import Box from '../core/box';
 import Ground from '../core/ground';
 import Label from '../core/label';
-import xhrz from '../xhrz';
+import papergirl from 'papergirl';
 import randomColor from 'randomcolor';
+import Forest from '../core/forest';
+import Traffic from '../core/traffic';
+import Config from '../config';
 
 import OBJMTLLoader from '../lib/loaders/OBJMTLLoader';
 
@@ -25,48 +28,13 @@ const coords = e => ((e = e.touches && e.touches[0] || e), ({ x: e.pageX, y: e.p
 export default class Game extends Component {
   constructor() {
     super();
-
-    // input
-    this.events = {
-      [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown,
-      [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
-      [TOUCH ? 'onTouchEnd' : 'onMouseUp']: ::this.mouseUp
-    };
   }
 
-  mouseDown(e) {
-    let { rotateX = 0, rotateY = 0 } = this.state;
-    this.downState = { rotateX, rotateY }
-    this.down = coords(e);
-    console.log("mouseDown:" + downState);
-    e.preventDefault();
-  }
-
-  mouseMove(e) {
-    if (!this.down) return;
-    let p = coords(e),
-      x = p.x - this.down.x,
-      y = p.y - this.down.y,
-      { rotateX, rotateY } = this.downState;
-    rotateX += x / innerWidth - .5;
-    rotateY += y / innerHeight - .5;
-    this.setState({ rotateX, rotateY });
-  }
-
-  mouseUp() {
-    this.downState = null;
-    this.down = null;
-    console.log("mouseUp");
-  }
-
-  render({}, { zoom = 1, rotateX = 0, rotateY = 0 }) {
+  render({}, { zoom = 1, rotateX = 0, rotationY = 0 }) {
     return (
       <div id="game">
-        <header>
-          <input type="range" value={zoom} min="0" max="10" step="0.00001" onInput={ this.linkState('zoom') } />
-        </header>
         <main {...this.events}>
-          <Scene {...{ zoom, rotateX, rotateY }} />
+          <Scene {...{ zoom, rotateX, rotationY }} />
         </main>
       </div>
     );
@@ -76,10 +44,25 @@ export default class Game extends Component {
 @connect(reduce, bindActions(actions))
 class Scene extends Component {
   constructor() {
-    console.log("Scene.constructor");
     super();
+
+    this.raycaster = new THREE.Raycaster();
+    this.mouse = new THREE.Vector2();
+    this.mouse_status = 'up';
+
+    this.targetRadian = 0;
+
     this.events = {
-      [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown
+      [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown,
+      [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
+      [TOUCH ? 'onTouchEnd' : 'onMouseUp']: ::this.mouseUp
+    };
+    
+    window.oncontextmenu = function(event) {
+      console.log('oncontextmenu');
+      event.preventDefault();
+      event.stopPropagation();
+      return false;
     };
   }
 
@@ -92,16 +75,62 @@ class Scene extends Component {
   }
 
   mouseDown(e) {
-    console.log("*scene.mouseDown");
     e.preventDefault();
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+    //this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    //this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
+
+    //console.log('*scene.mouseDown : ' + this.mouse.x);
+    
+        // update the picking ray with the camera and mouse position	
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    // calculate objects intersecting the picking ray
+    var intersects = this.raycaster.intersectObjects(this.scene.children);
+    //console.log(intersects.length);
+    for (var i = 0; i < intersects.length; i++) {
+      //intersects[i].object.material.color.set(0xff0000);
+      console.log(intersects[ 0 ].point.x, intersects[ 0 ].point.z);
+    }
+    
+    this.calculateTarget(e);
+    this.mouse_status = 'down';
+  }
+
+  mouseMove(e) {
+    e.preventDefault();
+    
+    if (this.mouse_status !== 'down')
+      return;
+
+    this.calculateTarget(e);
+  }
+
+  mouseUp(e) {
+    e.preventDefault();
+    
+    this.mouse_status = 'up';
+  }
+  
+  calculateTarget(e) {
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+    this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
+
+    let radian = Math.atan2(this.mouse.y, this.mouse.x);
+    //let theta = radian * 180 / Math.PI;
+    //this.targetTheta = Math.floor(theta / 90) * 90;
+    //this.targetRadian = this.targetTheta * Math.PI / 180;
+    this.targetRadian = radian;
   }
 
   //@debounce
   update() {
-    console.log(this.props);
-    let { events, zoom, rotateX, rotateY } = this.props;
+    //console.log(this.props);
+    let { events, zoom, rotateX, rotationY } = this.props;
     this.camera.rotation.y = rotateX * Math.PI;
-    this.camera.rotation.z = - rotateY * Math.PI;
+    this.camera.rotation.z = - rotationY * Math.PI;
     this.scene.scale.addScalar(zoom - this.scene.scale.x);
     this.rerender();
   }
@@ -112,7 +141,7 @@ class Scene extends Component {
 
   setup() {
     let self = this;
-    console.log("setup");
+    //console.log("setup");
     let { width, height } = this.base.getBoundingClientRect();
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(800, 640);
@@ -136,9 +165,8 @@ class Scene extends Component {
       40, window.innerWidth / window.innerHeight,
       1, 10000
     );
-    this.camera.position.set(900 * .382, 900, 900);
-    this.camera.target = new THREE.Vector3(0, 0, 0);
-    this.camera.lookAt(this.camera.target);
+    
+    this.letCameraFollowTarget(new THREE.Vector3(0, 0, 0));
 
     //this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
     //this.controls.damping = 0.2;
@@ -151,14 +179,14 @@ class Scene extends Component {
     this.rerender();
 
     this.decorate([
-      'data/01_infras.json',
+      'data/01_client.json',
       'data/02_dev.json',
-      'data/03_deploy.json',
-      'data/04_dist.json'
+      'data/03_server.json'
     ]);
 
-    // three
-    this.createTree(this.scene);
+    // Forest
+    new Forest(this.scene, 640, 640, 10);
+    this.traffic = new Traffic(this.scene);
 
     this.animate();
 
@@ -168,13 +196,13 @@ class Scene extends Component {
       self.onWindowResize(self);
     }, false);
   }
-
-  createTree(scene) {
-    var loader = new THREE.OBJMTLLoader();
-    loader.load('3d/Tree01.obj', '3d/Tree01.mtl', function(object) {
-      object.scale.set(20, 20, 20);
-      scene.add(object);
-    });
+  
+  letCameraFollowTarget(target) {
+    this.camera.position.set(target.x, target.y, target.z);
+    this.camera.rotation.set(-38.2*2, 38.2*0.5, 38.2*0.5);
+    this.camera.translateZ(1600);
+    this.camera.target = target;
+    this.camera.lookAt(this.camera.target);
   }
 
   animate() {
@@ -195,10 +223,10 @@ class Scene extends Component {
     var i = 0;
     sections.forEach(function(sectionURL) {
       // TODO : queue load
-      xhrz.get(sectionURL).then(function(jsonString) {
+      papergirl.watch().onSync(function(jsonString, url, options) {
         let json = JSON.parse(jsonString);
-        self.build(i++, json);
-      });
+        self.build(options.index, json);
+      }).request(sectionURL, { index: i++ });
     });
   }
 
@@ -206,14 +234,16 @@ class Scene extends Component {
     let self = this;
 
     // label style
-    let X0 = - sectionIndex * 800;
+    let X0 = - sectionIndex * 800 - 100;
+    let Z0 = 180;
     let LABEL_X = 64
     let group_x = 0;
     let group_h = 64;
     let item_h = 64;
 
+    self.scene
     // header
-    let header_label = new Label(self.scene, sectionData.title, X0 + 64, 0, 64, "normal small-caps bold 64px arial", "black", "yellow", 0);
+    let header_label = new Label(self.scene, sectionData.title, X0 + 64, 0, Z0 + 64, "normal small-caps bold 64px arial", "black", "yellow", 0);
 
     // section
     sectionData.group.forEach(function(group) {
@@ -226,8 +256,9 @@ class Scene extends Component {
         // chart
         let trend = 64 * item.trend / 10;
         let w = (trend < 128) ? trend : 128;
-        let item_x = -(group_x + group_h + j);
-        let box = new Box(self.scene, X0 - w / 2 + 64, item_x, w, 64 + 128 * item.percent / 100, item_h, randomColor({ luminosity: 'bright', format: 'rgb' }));
+        let item_x = Z0 -(group_x + group_h + j);
+        let h = 64 + 128 * item.percent / 100;
+        let box = new Box(self.scene, X0 - h / 2 + 64, item_x, h, w, item_h, randomColor({ luminosity: 'bright', format: 'rgb' }));
 
         // label
         let item_label = new Label(self.scene, item.title, X0 + LABEL_X, 0, item_x, "normal small-caps bold 40px arial", "grey", "black", 32);
@@ -236,7 +267,7 @@ class Scene extends Component {
       });
 
       // group
-      let group_label = new Label(self.scene, group.title, X0 + LABEL_X, 0, -group_x, "normal small-caps bold 56px arial", "white", "black", 0);
+      let group_label = new Label(self.scene, group.title, X0 + LABEL_X, 0, Z0-group_x, "normal small-caps bold 56px arial", "white", "black", 0);
       group_x += items_h + group_h;
     });
   }
@@ -247,23 +278,36 @@ class Scene extends Component {
     let self = this;
     window.requestAnimationFrame(function() { self.rerender(); });
 
+    self.traffic && self.traffic.update();
+
     let delta = this.clock.getDelta();
 
-    this.chickens && this.chickens.forEach(function(model) {
-      model.group.children.forEach(function(mesh) {
-        mesh.updateAnimation(1000 * delta);
-        mesh.translateX(model.speed * delta)
-      });
-    });
+    this.chickens && this.chickens.forEach(function(chicken) {
 
+      //let randomness = Math.random();
+      //chicken.rotationY = Math.PI / 2 * randomness;//self.targetTheta;
+      if (self.mouse_status === 'down') {
+
+        // console.log("targetRadian : " + self.targetRadian);        
+        //chicken.rotationY = self.targetRadian;
+        chicken.rotationY = 0;
+        var f = chicken.speed * delta * chicken.scale;
+        chicken.group.position.set(chicken.group.position.x + f * Math.cos(self.targetRadian), 20, chicken.group.position.z - f * Math.sin(self.targetRadian));
+        chicken.rotationY = self.targetRadian;
+        chicken.group.children.forEach(function(mesh) {
+          mesh.updateAnimation(1000 * delta);
+          //mesh.translateX(chicken.speed * delta);
+        });
+      }
+    });
 
     // follow camera
     if (this.chickens && this.chickens[0] && this.chickens[0].group.children[0]) {
       //console.log(this.chickens[0].group.children[0].position);
       //this.camera.position.set(900, 900, 900);
-      var target = this.chickens[0].group.children[0].position.clone();
-      this.camera.target = target.multiplyScalar(15);
-      //this.camera.lookAt(this.camera.target);
+      //var target = this.chickens[0].group.children[0].position.clone();
+      var target = this.chickens[0].group.position.clone();
+      this.letCameraFollowTarget(target);
     }
 
     this.renderer.clear();
@@ -279,7 +323,7 @@ class Scene extends Component {
 
     this.reference = new LoadModels();
     this.reference.load().then(function() {
-      new Chicken(200, 20, 200, 15, self.reference, self.scene, self.chickens);
+      new Chicken(0, 20, 0, Config.SCALE, self.reference, self.scene, self.chickens);
     });
   }
 
@@ -303,11 +347,11 @@ class Scene extends Component {
     this.xLight.position.set(1, 0, 0).normalize();
     this.scene.add(this.xLight);
 
-    this.yLight = new THREE.DirectionalLight(0xffffff, 0.1);
+    this.yLight = new THREE.DirectionalLight(0xffffff, 0.2);
     this.yLight.position.set(0, 1, 0).normalize();
     this.scene.add(this.yLight);
 
-    this.zLight = new THREE.DirectionalLight(0xff0000, 0.382);
+    this.zLight = new THREE.DirectionalLight(0x111111, 0.1);
     this.zLight.position.set(0, 0, 1).normalize();
     this.scene.add(this.zLight);
 
