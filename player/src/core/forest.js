@@ -1,3 +1,4 @@
+import Config from '../config';
 import THREE from 'three';
 
 export default class Forest {
@@ -8,7 +9,7 @@ export default class Forest {
         var loader = new THREE.OBJMTLLoader();
         loader.load('3d/Tree01.obj', '3d/Tree01.mtl', function(tree) {
 
-            tree.scale.set(15, 15, 15);
+            tree.scale.set(Config.SCALE, Config.SCALE, Config.SCALE);
 
             for (var i = 0; i < 10; i++) {
                 //for (var j = 0; j < h; i += h/sh) {

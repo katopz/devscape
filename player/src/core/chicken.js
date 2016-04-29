@@ -46,7 +46,7 @@ export default class Chicken {
         this.scene.add(this.group);
     }
 
-    set rotateY(theta) {
+    set rotationY(theta) {
         let self = this;
         self.group.children.forEach(function(model) {
             model.rotation.y = theta;

@@ -16,6 +16,8 @@ import Label from '../core/label';
 import papergirl from 'papergirl';
 import randomColor from 'randomcolor';
 import Forest from '../core/forest';
+import Traffic from '../core/traffic';
+import Config from '../config';
 
 import OBJMTLLoader from '../lib/loaders/OBJMTLLoader';
 
@@ -28,14 +30,14 @@ export default class Game extends Component {
     super();
   }
 
-  render({}, { zoom = 1, rotateX = 0, rotateY = 0 }) {
+  render({}, { zoom = 1, rotateX = 0, rotationY = 0 }) {
     return (
       <div id="game">
         <header>
           <input type="range" value={zoom} min="0" max="10" step="0.00001" onInput={ this.linkState('zoom') } />
         </header>
         <main {...this.events}>
-          <Scene {...{ zoom, rotateX, rotateY }} />
+          <Scene {...{ zoom, rotateX, rotationY }} />
         </main>
       </div>
     );
@@ -123,9 +125,9 @@ class Scene extends Component {
   //@debounce
   update() {
     //console.log(this.props);
-    let { events, zoom, rotateX, rotateY } = this.props;
+    let { events, zoom, rotateX, rotationY } = this.props;
     this.camera.rotation.y = rotateX * Math.PI;
-    this.camera.rotation.z = - rotateY * Math.PI;
+    this.camera.rotation.z = - rotationY * Math.PI;
     this.scene.scale.addScalar(zoom - this.scene.scale.x);
     this.rerender();
   }
@@ -182,6 +184,7 @@ class Scene extends Component {
 
     // Forest
     new Forest(this.scene, 1000, 1000, 10);
+    this.traffic = new Traffic(this.scene);
 
     this.animate();
 
@@ -271,22 +274,22 @@ class Scene extends Component {
     let self = this;
     window.requestAnimationFrame(function() { self.rerender(); });
 
-
+    self.traffic && self.traffic.update();
 
     let delta = this.clock.getDelta();
 
     this.chickens && this.chickens.forEach(function(chicken) {
 
       //let randomness = Math.random();
-      //chicken.rotateY = Math.PI / 2 * randomness;//self.targetTheta;
+      //chicken.rotationY = Math.PI / 2 * randomness;//self.targetTheta;
       if (self.mouse_status === 'down') {
 
         // console.log("targetRadian : " + self.targetRadian);        
-        //chicken.rotateY = self.targetRadian;
-        chicken.rotateY = 0;
+        //chicken.rotationY = self.targetRadian;
+        chicken.rotationY = 0;
         var f = chicken.speed * delta * chicken.scale;
         chicken.group.position.set(chicken.group.position.x + f * Math.cos(self.targetRadian), 20, chicken.group.position.z - f * Math.sin(self.targetRadian));
-        chicken.rotateY = self.targetRadian;
+        chicken.rotationY = self.targetRadian;
         chicken.group.children.forEach(function(mesh) {
           mesh.updateAnimation(1000 * delta);
           //mesh.translateX(chicken.speed * delta);
@@ -316,7 +319,7 @@ class Scene extends Component {
 
     this.reference = new LoadModels();
     this.reference.load().then(function() {
-      new Chicken(0, 20, 0, 15, self.reference, self.scene, self.chickens);
+      new Chicken(0, 20, 0, Config.SCALE, self.reference, self.scene, self.chickens);
     });
   }
 
