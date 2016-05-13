@@ -52,6 +52,11 @@ export default class Chicken {
             model.rotation.y = theta;
         });
     }
+    
+    get rotationY() {
+        let self = this;
+        return self.group.children[0].rotation.y;
+    }
 
     update() {
 
