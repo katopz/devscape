@@ -211,7 +211,7 @@ class Scene extends Component {
     this.camera.target = target;
     this.camera.lookAt(this.camera.target);
     
-    /* 
+    /*
     //for top view
     this.camera.position.set(-640, 0, 0);
     this.camera.rotation.set(-Math.PI/2, 0, 0);
@@ -338,7 +338,7 @@ class Scene extends Component {
 
     this.reference = new LoadModels();
     this.reference.load().then(function() {
-      new Chicken(0, 20, 0, Config.SCALE, self.reference, self.scene, self.chickens);
+      new Chicken(480, 20, 240, Config.SCALE, self.reference, self.scene, self.chickens);
     });
   }
 

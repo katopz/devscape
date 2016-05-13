@@ -55,6 +55,7 @@ export default class Traffic {
             _obj3d.rotation.y = Math.PI/2;
             scene.add(_obj3d);
             self.vehicles.push(_obj3d);
+            _obj3d.name = 'car';
        });
        
         // train
@@ -62,13 +63,15 @@ export default class Traffic {
         loader.load('3d/Train.obj', '3d/Train.mtl', function(obj3d) {
             obj3d.scale.set(Config.SCALE*2 , Config.SCALE*2 , Config.SCALE*2 );
             var _obj3d;
+            let train_x0 = 1500;
             
             // Train 1 : max -> min
             _obj3d = obj3d.clone();
-            _obj3d.position.set(self.MAX_EDGE - 640, 0, self.Z0 + 480 - 16);
+            _obj3d.position.set(self.MAX_EDGE + train_x0, 0, self.Z0 + 480 - 16);
             _obj3d.rotation.y = Math.PI/2;
             scene.add(_obj3d);
             self.vehicles.push(_obj3d);
+            _obj3d.name = 'train';
        });
         
        return this
@@ -87,8 +90,12 @@ export default class Traffic {
                 obj3d.position.x = self.MIN_EDGE;
             }
             
-            // move
-            obj3d.translateZ(-4);
+            // move baby move
+            if(obj3d.name == 'train') {
+                obj3d.translateZ(-8);
+            } else {
+                obj3d.translateZ(-4);
+            }
         })
     }
 }

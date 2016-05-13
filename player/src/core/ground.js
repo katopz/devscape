@@ -21,6 +21,8 @@ export default class Ground {
 
         this.HGAP = 0.5;
 
+        this._buildRail(scene, 2, -_W, _Z0 - 40 - (128*2), _W * 4, _H, 32);
+        
         this._buildRoad(scene, 2, -_W, _Z0 - 40, _W * 4, _H, 32);
         this._buildGrass(scene, -_W, -_Z0, _W * 4, _H * 4, 32);
         this._buildGrass(scene, -_W, _Z0 + 40 + _H + 52 , _W * 4, _H * 2, 32);
@@ -55,7 +57,6 @@ export default class Ground {
             scene.add(plane);
         });
     }
-
 
     _buildSoil2(scene, x, z, w, d, h) {
         let self = this;
@@ -131,5 +132,13 @@ export default class Ground {
 			wireframe: false
 		} );
         */
+    }
+    
+    _buildRail(scene, x, z, w, d, h) {
+        var geometry = new THREE.BoxGeometry(w, h, d);
+        var material = new THREE.MeshPhongMaterial({ color: 0x726994 });//, emissive: 0x333333, specular: 0x333333 });
+
+        this.mesh = new THREE.Mesh(geometry, material);
+        this.mesh.position.set(x, -h / 2 - this.HGAP, z);
     }
 }
