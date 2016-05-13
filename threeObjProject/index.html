@@ -230,11 +230,11 @@
             var mtlLoader = new THREE.MTLLoader();
             mtlLoader.setBaseUrl('obj/test/');
             mtlLoader.setPath('obj/test/');
-            mtlLoader.load('Truck.mtl', function (materials) {
+            mtlLoader.load('TrainFull2.mtl', function (materials) {
                 materials.preload();
 
                 var objLoader = new THREE.OBJLoader(manager);
-                objLoader.load('obj/test/Truck.obj', function (object) {
+                objLoader.load('obj/test/TrainFull2.obj', function (object) {
                     scene.add(object);
                 }, onProgress, onError);
                 objLoader.setMaterials(materials);
