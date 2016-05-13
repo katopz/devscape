@@ -93,6 +93,11 @@ class Scene extends Component {
       console.log(intersects[ 0 ].point.x, intersects[ 0 ].point.z);
     }
     
+    if ( intersects.length > 0 ) {
+      console.log( intersects[0].object.name);
+        intersects[0].object.callback();
+    }
+    
     this.calculateTarget(e);
     this.mouse_status = 'down';
   }
@@ -202,7 +207,14 @@ class Scene extends Component {
     this.camera.rotation.set(-38.2*2, 38.2*0.5, 38.2*0.5);
     this.camera.translateZ(1600);
     this.camera.target = target;
-    this.camera.lookAt(this.camera.target);
+     this.camera.lookAt(this.camera.target);
+    
+     
+    //for top view
+    this.camera.position.set(-640, 0, 0);
+    this.camera.rotation.set(-Math.PI/2, 0, 0);
+    this.camera.translateZ(1600*3);
+    //this.camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
   }
 
   animate() {
