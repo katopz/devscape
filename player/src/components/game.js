@@ -324,6 +324,11 @@ class Scene extends Component {
       var target = this.chickens[0].group.position.clone();
       this.letCameraFollowTarget(target);
     }
+    
+    // light
+    if(this.traffic_light) {
+      this.traffic_light.intensity = Math.sin(this.theta+=Math.PI/15) / 2 + 0.5;
+    }
 
     this.renderer.clear();
     this.renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
@@ -369,6 +374,17 @@ class Scene extends Component {
     this.zLight = new THREE.DirectionalLight(0x111111, 0.1);
     this.zLight.position.set(0, 0, 1).normalize();
     this.scene.add(this.zLight);
+    
+    var geometry = new THREE.SphereGeometry( 4, 16, 16 );
+    var material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
+    var sphere = new THREE.Mesh( geometry, material );
+    this.scene.add( sphere );
+    sphere.position.set(-220, 200, 930);
+    
+    this.theta = 0;
+    this.traffic_light = new THREE.PointLight(0xFF0000, 1, Math.sin(this.theta), 10);
+    this.traffic_light.position.set(sphere.position.x, sphere.position.y, sphere.position.z);
+    this.scene.add(this.traffic_light);
 
     /*
     var spotLight = new THREE.SpotLight(0x00ff00);

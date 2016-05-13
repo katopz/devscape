@@ -8,7 +8,7 @@ export default class Chicken {
         this.position = new THREE.Vector3(x, y, z);
         this.group = new THREE.Group();
         this.scene = scene;
-        this.speed = 6;
+        this.speed = 12;
         this.rotation = 0;
         this.chickens = chickens;
         this.body = reference.body.clone()

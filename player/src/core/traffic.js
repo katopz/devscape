@@ -31,14 +31,14 @@ export default class Traffic {
             
             // truck 2 : min -> max
             _obj3d = obj3d.clone();
-            _obj3d.position.set(self.MIN_EDGE, 0, self.Z0 + 200 - 16);
+            _obj3d.position.set(self.MIN_EDGE + 320, 0, self.Z0 + 200 - 16);
             _obj3d.rotation.y = -Math.PI/2;
             scene.add(_obj3d);
             self.vehicles.push(_obj3d);
             
             // truck 2.1 : min -> max
             _obj3d = _obj3d.clone();
-            _obj3d.position.set(self.MIN_EDGE + 640, 0, self.Z0 + 200 - 16);
+            _obj3d.position.set(self.MIN_EDGE + 720, 0, self.Z0 + 200 - 16);
             scene.add(_obj3d);
             self.vehicles.push(_obj3d);
         });
@@ -76,6 +76,21 @@ export default class Traffic {
             _obj3d.name = 'car';
        });
        
+        // cars yellow
+        var loader = new THREE.OBJMTLLoader();
+        loader.load('3d/Car.obj', '3d/CarYellow.mtl', function(obj3d) {
+            obj3d.scale.set(Config.SCALE*2 , Config.SCALE*2 , Config.SCALE*2 );
+            var _obj3d;
+            
+            // car yellow : min -> max
+            _obj3d = obj3d.clone();
+            _obj3d.position.set(self.MIN_EDGE, 0, self.Z0 + 200 - 16);
+            _obj3d.rotation.y = -Math.PI/2;
+            scene.add(_obj3d);
+            self.vehicles.push(_obj3d);
+            //_obj3d.name = 'car';
+       });
+       
         // train
         var loader = new THREE.OBJMTLLoader();
         loader.load('3d/Train.obj', '3d/Train.mtl', function(obj3d) {
@@ -103,17 +118,7 @@ export default class Traffic {
             _obj3d.rotation.y = -Math.PI/2;
             scene.add(_obj3d);
        });
-       
-        var loader = new THREE.OBJMTLLoader();
-        loader.load('3d/Coin.obj', '3d/Coin.mtl', function(obj3d) {
-            obj3d.scale.set(Config.SCALE*2 , Config.SCALE*2 , Config.SCALE*2 );
-            var _obj3d;
-
-            _obj3d = obj3d.clone();
-            _obj3d.position.set(-240, 100, 930);
-            scene.add(_obj3d);
-       });
-        
+ 
        return this
     }
     
@@ -132,9 +137,9 @@ export default class Traffic {
             
             // move baby move
             if(obj3d.name == 'train') {
-                obj3d.translateZ(-8);
+                obj3d.translateZ(-16);
             } else {
-                obj3d.translateZ(-4);
+                obj3d.translateZ(-8);
             }
         })
     }

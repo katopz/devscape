@@ -36,17 +36,32 @@ export default class Forest {
         ];
 
         var loader = new THREE.OBJMTLLoader();
-        loader.load('3d/Tree01.obj', '3d/Tree01.mtl', function(tree) {
+        loader.load('3d/Coin.obj', '3d/Coin.mtl', function(coin) {
+            coin.scale.set(Config.SCALE * 2, Config.SCALE * 2, Config.SCALE * 2);
 
-            tree.scale.set(Config.SCALE, Config.SCALE, Config.SCALE);
+            var loader = new THREE.OBJMTLLoader();
+            loader.load('3d/Tree01.obj', '3d/Tree01.mtl', function(tree) {
 
-            for (var i = 0; i < maps.length; i++) {
-                if (maps[i] == 0 && (Math.random() > 0.2)) {
-                    var mesh = tree.clone();
-                    mesh.position.set(_X0 + (i % 20) * _SPAN, 0, _Y0 + (Math.floor(i / 20)) * _SPAN);
-                    scene.add(mesh);
+                tree.scale.set(Config.SCALE, Config.SCALE, Config.SCALE);
+
+                for (var i = 0; i < maps.length; i++) {
+                    if (maps[i] == 0) {
+
+                        let positionX = _X0 + (i % 20) * _SPAN;
+                        let positionY = _Y0 + (Math.floor(i / 20)) * _SPAN;
+
+                        var mesh;
+                        if (Math.random() > 0.2) {
+                            mesh = tree.clone();
+                        } else {
+                            mesh = coin.clone();
+                        }
+
+                        mesh.position.set(positionX, 0, positionY);
+                        scene.add(mesh);
+                    }
                 }
-            }
+            });
         });
     }
 }
