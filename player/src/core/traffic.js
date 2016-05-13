@@ -43,6 +43,24 @@ export default class Traffic {
             self.vehicles.push(_obj3d);
         });
         
+        /*
+        // bus
+        var loader = new THREE.OBJMTLLoader();
+        loader.load('3d/BusNo8.obj', '3d/BusNo8.mtl', function(obj3d) {
+            obj3d.scale.set(Config.SCALE*2 , Config.SCALE*2 , Config.SCALE*2 );
+            var _obj3d;
+            
+            // bus 1 : max -> min
+            _obj3d = obj3d.clone();
+            _obj3d.position.set(self.MAX_EDGE - 640 - 320, 0, self.Z0 + 320 - 16);
+            _obj3d.rotation.y = Math.PI/2;
+            scene.add(_obj3d);
+            self.vehicles.push(_obj3d);
+            
+            _obj3d.name = 'bus';
+       });
+       */
+        
         // cars
         var loader = new THREE.OBJMTLLoader();
         loader.load('3d/Car.obj', '3d/Car.mtl', function(obj3d) {
@@ -67,7 +85,7 @@ export default class Traffic {
             
             // Train 1 : max -> min
             _obj3d = obj3d.clone();
-            _obj3d.position.set(self.MAX_EDGE + train_x0, 0, self.Z0 + 480 - 16);
+            _obj3d.position.set(self.MAX_EDGE + train_x0, 32, self.Z0 + 480 - 16 + 96);
             _obj3d.rotation.y = Math.PI/2;
             scene.add(_obj3d);
             self.vehicles.push(_obj3d);

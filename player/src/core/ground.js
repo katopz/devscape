@@ -21,14 +21,44 @@ export default class Ground {
 
         this.HGAP = 0.5;
 
-        this._buildRail(scene, 2, -_W, _Z0 - 40 - (128*2), _W * 4, _H, 32);
-        
-        this._buildRoad(scene, 2, -_W, _Z0 - 40, _W * 4, _H, 32);
         this._buildGrass(scene, -_W, -_Z0, _W * 4, _H * 4, 32);
-        this._buildGrass(scene, -_W, _Z0 + 40 + _H + 52 , _W * 4, _H * 2, 32);
+        this._buildRoad(scene, 2, -_W, _Z0 - 38, _W * 4, _H, 32);       
+        
+        this._buildGrass(scene, -_W, _Z0 + 128 + 26, _W * 4, 128, 32);
+        this._buildRailRoad(scene, 1, -_W, _Z0 + 128 + 128 + 36, _W * 4, _H, 32);
+        
+        this._buildRail(scene, -_W, _Z0 + 240, _W * 4, 16, 16);
+        this._buildGrass(scene, -_W, _Z0 + 640, _W * 4, 520, 32);
 
         this._buildSoil(scene, -_W, _Z0 + 18 + _W + 170, _W * 4, 0, _W);
         this._buildSoil2(scene, _W, 0, _W * 4 + 60, 0, _W);
+    }
+        
+    _buildRail(scene, x, z, w, d, h) {
+        // rail1
+        var geometry = new THREE.BoxGeometry(w, h, d);
+        var material = new THREE.MeshPhongMaterial({ color: 0x726994 });//, emissive: 0x333333, specular: 0x333333 });
+
+        this.mesh = new THREE.Mesh(geometry, material);
+        this.mesh.position.set(x, -h / 2 - 0.3 + 16, z + 16);
+        scene.add(this.mesh);
+        
+        // rail2
+        var _obj3d = this.mesh.clone();
+        this.mesh.position.set(x, -h / 2 - 0.3 + 16, z + 110);
+        scene.add(_obj3d);
+        
+        // pillows
+        var geometry = new THREE.BoxGeometry(128, h, d);
+        var material = new THREE.MeshPhongMaterial({ color: 0x70343a });
+        this.mesh = new THREE.Mesh(geometry, material);
+        this.mesh.rotation.y = -Math.PI / 2;
+
+        for (var i=0; i < 26; i++) {
+            var _obj3d = this.mesh.clone();
+            _obj3d.position.set(i*100 + x -w/2, -h / 2 - 0.3, z + 128 / 2);
+            scene.add(_obj3d);
+        }
     }
 
     _buildGrass(scene, x, z, w, d, h) {
@@ -78,31 +108,6 @@ export default class Ground {
     _buildRoad(scene, lane, x, z, w, d, h) {
         // decal : 0x7b8496
         // road : 0x525763
-        /*
-        var texture = new THREE.TextureLoader().load("textures/road_decal.png", function(texture) {
-            // do something with the texture
-            var material = new THREE.MeshBasicMaterial({
-                map: texture
-            });
-
-            var geometry = new THREE.PlaneGeometry(5, 20, 32);
-            this.mesh = new THREE.Mesh(geometry, material);
-            this.mesh.position.set(x, -h / 2 - this.HGAP, z);
-            scene.add(this.mesh);
-        });
-
-        texture.wrapS = THREE.RepeatWrapping;
-        texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.set(2, 2);
-        */
-
-        var geometry = new THREE.BoxGeometry(w, h, d);
-        var material = new THREE.MeshPhongMaterial({ color: 0x525763 });//, emissive: 0x333333, specular: 0x333333 });
-
-        this.mesh = new THREE.Mesh(geometry, material);
-        this.mesh.position.set(x, -h / 2 - this.HGAP, z);
-        //scene.add(this.mesh);
-
         let _SECTION_W = 128;
         var texture = new THREE.TextureLoader().load("textures/road_decal.png", function(texture) {
             texture.wrapS = THREE.RepeatWrapping;
@@ -115,30 +120,15 @@ export default class Ground {
             plane.rotation.x = -Math.PI / 2;
             scene.add(plane);
         });
-
-        /*
-        var textureLoader = new THREE.TextureLoader();
-		var decalDiffuse = textureLoader.load( 'textures/road_decal.png' );
-        var decalMaterial = new THREE.MeshPhongMaterial( {
-			specular: 0x444444,
-			map: decalDiffuse,
-			normalScale: new THREE.Vector2( 1, 1 ),
-			shininess: 30,
-			transparent: true,
-			depthTest: true,
-			depthWrite: false,
-			polygonOffset: true,
-			polygonOffsetFactor: - 4,
-			wireframe: false
-		} );
-        */
     }
     
-    _buildRail(scene, x, z, w, d, h) {
-        var geometry = new THREE.BoxGeometry(w, h, d);
-        var material = new THREE.MeshPhongMaterial({ color: 0x726994 });//, emissive: 0x333333, specular: 0x333333 });
-
-        this.mesh = new THREE.Mesh(geometry, material);
-        this.mesh.position.set(x, -h / 2 - this.HGAP, z);
+    _buildRailRoad(scene, lane, x, z, w, d, h) {
+        let _SECTION_W = 160;
+        var material = new THREE.MeshPhongMaterial({ color: 0x525763 });
+        var geometry = new THREE.PlaneGeometry(w, _SECTION_W * lane, 1);
+        var plane = new THREE.Mesh(geometry, material);
+        plane.position.set(x, -h / 2 - 0.3, z);
+        plane.rotation.x = -Math.PI / 2;
+        scene.add(plane);
     }
 }
