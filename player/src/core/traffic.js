@@ -91,6 +91,28 @@ export default class Traffic {
             self.vehicles.push(_obj3d);
             _obj3d.name = 'train';
        });
+       
+        // train light
+        var loader = new THREE.OBJMTLLoader();
+        loader.load('3d/TrafficLight.obj', '3d/TrafficLight.mtl', function(obj3d) {
+            obj3d.scale.set(Config.SCALE*2 , Config.SCALE*2 , Config.SCALE*2 );
+            var _obj3d;
+
+            _obj3d = obj3d.clone();
+            _obj3d.position.set(-240, 0, 900);
+            _obj3d.rotation.y = -Math.PI/2;
+            scene.add(_obj3d);
+       });
+       
+        var loader = new THREE.OBJMTLLoader();
+        loader.load('3d/Coin.obj', '3d/Coin.mtl', function(obj3d) {
+            obj3d.scale.set(Config.SCALE*2 , Config.SCALE*2 , Config.SCALE*2 );
+            var _obj3d;
+
+            _obj3d = obj3d.clone();
+            _obj3d.position.set(-240, 100, 930);
+            scene.add(_obj3d);
+       });
         
        return this
     }
