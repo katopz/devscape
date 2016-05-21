@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "When DevOps meet Crossy Road <3",
   "scripts": {
-    "browser": "opener http://localhost:8080/",
-    "dev": "npm run browser && cross-env NODE_ENV=development webpack-dev-server --inline --hot --progress",
+    "browser": "opener http://localhost:3000/",
+    "dev": "npm run browser && cross-env NODE_ENV=development webpack-dev-server --inline --hot --progress --port 3000",
     "start": "superstatic build -p ${PORT:-8080} --host 0.0.0.0 --gzip -c '{\"rewrites\": [{\"source\":\"**\",\"destination\":\"index.html\"}],\"headers\":[{\"source\":\"**\",\"headers\":[{\"key\":\"Cache-Control\",\"value\":\"max-age=86400\"}]}]}'",
     "prestart": "npm run build",
     "build": "cross-env NODE_ENV=production webpack -p --progress",

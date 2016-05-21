@@ -36,11 +36,20 @@ export default class Forest {
         ];
 
         var loader = new THREE.OBJMTLLoader();
-        loader.load('3d/Coin.obj', '3d/Coin.mtl', function(coin) {
+        loader.load('3d/Coin.obj', '3d/Coin.mtl', function (coin) {
             coin.scale.set(Config.SCALE * 2, Config.SCALE * 2, Config.SCALE * 2);
 
+            var object = coin;
+            object.traverse(function (child) {
+                if (child instanceof THREE.Mesh) {
+                    child.material.shininess = 100;
+                    child.material.blending = THREE.AdditiveBlending;
+                }
+            });
+            //coin.material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
             var loader = new THREE.OBJMTLLoader();
-            loader.load('3d/Tree01.obj', '3d/Tree01.mtl', function(tree) {
+            loader.load('3d/Tree01.obj', '3d/Tree01.mtl', function (tree) {
 
                 tree.scale.set(Config.SCALE, Config.SCALE, Config.SCALE);
 

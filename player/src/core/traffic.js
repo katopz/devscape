@@ -31,14 +31,14 @@ export default class Traffic {
             
             // truck 2 : min -> max
             _obj3d = obj3d.clone();
-            _obj3d.position.set(self.MIN_EDGE + 320, 0, self.Z0 + 200 - 16);
+            _obj3d.position.set(self.MIN_EDGE + 320 + 400, 0, self.Z0 + 200 - 16);
             _obj3d.rotation.y = -Math.PI/2;
             scene.add(_obj3d);
             self.vehicles.push(_obj3d);
             
             // truck 2.1 : min -> max
             _obj3d = _obj3d.clone();
-            _obj3d.position.set(self.MIN_EDGE + 720, 0, self.Z0 + 200 - 16);
+            _obj3d.position.set(self.MIN_EDGE + 320 + 400 + 400, 0, self.Z0 + 200 - 16);
             scene.add(_obj3d);
             self.vehicles.push(_obj3d);
         });

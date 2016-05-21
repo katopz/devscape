@@ -273,16 +273,17 @@ class Scene extends Component {
         let w = (trend < 128) ? trend : 128;
         let item_x = Z0 -(group_x + group_h + j);
         let h = 64 + 128 * item.percent / 100;
-        let box = new Box(self.scene, X0 - h / 2 + 64, item_x, h, w, item_h, randomColor({ luminosity: 'bright', format: 'rgb' }));
+        let color = randomColor({ luminosity: 'bright', format: 'rgb' });
+        let box = new Box(self.scene, X0 - h / 2 + 64, item_x, h, w, item_h, color);
 
         // label
-        let item_label = new Label(self.scene, item.title, X0 + LABEL_X, 0, item_x, "normal small-caps bold 40px arial", "grey", "black", 32);
+        let item_label = new Label(self.scene, item.title, X0 + LABEL_X, 0, item_x, "normal small-caps bold 40px arial", "white", color, 24);
 
         j += 64;
       });
 
       // group
-      let group_label = new Label(self.scene, group.title, X0 + LABEL_X, 0, Z0-group_x, "normal small-caps bold 56px arial", "white", "black", 0);
+      let group_label = new Label(self.scene, group.title, X0 + LABEL_X, 0, Z0-group_x, "normal small-caps bold 56px arial", "#b0e65a", "#black", 10);
       group_x += items_h + group_h;
     });
   }
@@ -375,15 +376,20 @@ class Scene extends Component {
     this.zLight.position.set(0, 0, 1).normalize();
     this.scene.add(this.zLight);
     
+    /*
+    // for debug traffic_light
     var geometry = new THREE.SphereGeometry( 4, 16, 16 );
     var material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
     var sphere = new THREE.Mesh( geometry, material );
     this.scene.add( sphere );
     sphere.position.set(-220, 200, 930);
+    */
     
     this.theta = 0;
-    this.traffic_light = new THREE.PointLight(0xFF0000, 1, Math.sin(this.theta), 10);
-    this.traffic_light.position.set(sphere.position.x, sphere.position.y, sphere.position.z);
+    // PointLight( color, intensity, distance, decay )
+    this.traffic_light = new THREE.PointLight(0xFF0000, Math.sin(this.theta), 500);
+    //this.traffic_light.position.set(sphere.position.x, sphere.position.y, sphere.position.z);
+    this.traffic_light.position.set(-220, 200, 930);
     this.scene.add(this.traffic_light);
 
     /*
