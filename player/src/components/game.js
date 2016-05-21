@@ -18,6 +18,7 @@ import randomColor from 'randomcolor';
 import Forest from '../core/forest';
 import Traffic from '../core/traffic';
 import Config from '../config';
+import Logo from '../core/logo';
 
 import OBJMTLLoader from '../lib/loaders/OBJMTLLoader';
 
@@ -45,6 +46,8 @@ export default class Game extends Component {
 class Scene extends Component {
   constructor() {
     super();
+    
+    this.state = 'wait';
 
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
@@ -57,8 +60,8 @@ class Scene extends Component {
       [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
       [TOUCH ? 'onTouchEnd' : 'onMouseUp']: ::this.mouseUp
     };
-    
-    window.oncontextmenu = function(event) {
+
+    window.oncontextmenu = function (event) {
       console.log('oncontextmenu');
       event.preventDefault();
       event.stopPropagation();
@@ -82,31 +85,36 @@ class Scene extends Component {
     //this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
 
     //console.log('*scene.mouseDown : ' + this.mouse.x);
-    
-        // update the picking ray with the camera and mouse position	
+
+    // update the picking ray with the camera and mouse position	
     this.raycaster.setFromCamera(this.mouse, this.camera);
     // calculate objects intersecting the picking ray
     var intersects = this.raycaster.intersectObjects(this.scene.children);
     //console.log(intersects.length);
     for (var i = 0; i < intersects.length; i++) {
       //intersects[i].object.material.color.set(0xff0000);
-      console.log(intersects[ 0 ].point.x, intersects[ 0 ].point.z);
+      console.log(intersects[0].point.x, intersects[0].point.z);
     }
-    
+
     /*
     if ( intersects.length > 0 ) {
       console.log( intersects[0].object.name);
         intersects[0].object.callback();
     }
     */
-    
+
     this.calculateTarget(e);
     this.mouse_status = 'down';
+    
+    // First click
+    if(this.state === 'wait') {
+      this.state = 'play';
+    }
   }
 
   mouseMove(e) {
     e.preventDefault();
-    
+
     if (this.mouse_status !== 'down')
       return;
 
@@ -115,10 +123,10 @@ class Scene extends Component {
 
   mouseUp(e) {
     e.preventDefault();
-    
+
     this.mouse_status = 'up';
   }
-  
+
   calculateTarget(e) {
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
@@ -151,7 +159,9 @@ class Scene extends Component {
     //console.log("setup");
     let { width, height } = this.base.getBoundingClientRect();
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setSize(800, 640);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.autoClear = false;
     this.base.appendChild(this.renderer.domElement);
 
     this.clock = new THREE.Clock();
@@ -167,12 +177,24 @@ class Scene extends Component {
     this.camera.position.set(-15, 10, 15);
     this.camera.lookAt(this.scene.position);
     */
+    /*
+    var aspect = window.innerWidth / window.innerHeight;
+    var d = 20;
+    this.camera = new THREE.OrthographicCamera( - d * aspect, d * aspect, d, - d, 1, 1000 );
+    this.camera.position.set( 20, 20, 20 ); // all components equal
+    this.camera.lookAt( this.scene.position ); // or the origin
+    */
 
     this.camera = new THREE.PerspectiveCamera(
-      40, window.innerWidth / window.innerHeight,
-      1, 10000
+      10,         // FOV
+      window.innerWidth / window.innerHeight,  // Aspect
+      10,        // Near
+      10000       // Far
     );
-    
+
+    // HUD
+    this.setupHUD();
+
     this.letCameraFollowTarget(new THREE.Vector3(0, 0, 0));
 
     //this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
@@ -197,20 +219,58 @@ class Scene extends Component {
 
     this.animate();
 
+    // Logo
+    this.logo = new Logo(this.scene);
+
     // TODO : move to external?
 
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
       self.onWindowResize(self);
     }, false);
   }
-  
+
+  setupHUD() {
+    let self = this;
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    this.cameraOrtho = new THREE.OrthographicCamera(- width / 2, width / 2, height / 2, - height / 2, 1, 10);
+    this.cameraOrtho.position.z = 10;
+
+    this.sceneOrtho = new THREE.Scene();
+
+    new THREE.TextureLoader().load("textures/devscape_logo.png", function (texture) {
+      var material = new THREE.SpriteMaterial({ map: texture });
+      self.spriteC = new THREE.Sprite(material);
+      var tw = material.map.image.width;
+      var th = material.map.image.height;
+
+      // media query
+      if (width <= 414) {
+        tw = tw / 1.75;
+        th = th / 1.75;
+      } else if (width <= 320) {
+        tw = tw / 2;
+        th = th / 2;
+      }
+
+      self.spriteC.scale.set(tw, th, 1);
+      self.sceneOrtho.add(self.spriteC);
+      self.spriteC.position.set(0, 200, 1); // center
+    });
+  }
+
+  toRad(degree) {
+    return degree * Math.PI / 180;
+  }
+
   letCameraFollowTarget(target) {
     this.camera.position.set(target.x, target.y, target.z);
-    this.camera.rotation.set(-38.2*2, 38.2*0.5, 38.2*0.5);
-    this.camera.translateZ(1600);
+    this.camera.rotation.set(this.toRad(-45), this.toRad(16), this.toRad(16));
+    this.camera.translateZ(4600);
     this.camera.target = target;
     this.camera.lookAt(this.camera.target);
-    
+
     /*
     // for top view test
     this.camera.position.set(-640, 0, 0);
@@ -222,7 +282,7 @@ class Scene extends Component {
 
   animate() {
     setInterval(() => {
-      this.chickens && this.chickens.forEach(function(chicken) {
+      this.chickens && this.chickens.forEach(function (chicken) {
         chicken.update();
       });
     }, Math.floor(Math.random() * 7000) + 3000);
@@ -236,9 +296,9 @@ class Scene extends Component {
 
     // sections
     var i = 0;
-    sections.forEach(function(sectionURL) {
+    sections.forEach(function (sectionURL) {
       // TODO : queue load
-      papergirl.watch().onSync(function(jsonString, url, options) {
+      papergirl.watch().onSync(function (jsonString, url, options) {
         let json = JSON.parse(jsonString);
         self.build(options.index, json);
       }).request(sectionURL, { index: i++ });
@@ -256,22 +316,21 @@ class Scene extends Component {
     let group_h = 64;
     let item_h = 64;
 
-    self.scene
     // header
     let header_label = new Label(self.scene, sectionData.title, X0 + 64, 0, Z0 + 64, "normal small-caps bold 64px arial", "black", "yellow", 0);
 
     // section
-    sectionData.group.forEach(function(group) {
+    sectionData.group.forEach(function (group) {
 
       var j = 0;
       var items_h = group.items.length * item_h;
 
-      group.items.forEach(function(item) {
+      group.items.forEach(function (item) {
 
         // chart
         let trend = 64 * item.trend / 10;
         let w = (trend < 128) ? trend : 128;
-        let item_x = Z0 -(group_x + group_h + j);
+        let item_x = Z0 - (group_x + group_h + j);
         let h = 64 + 128 * item.percent / 100;
         let color = randomColor({ luminosity: 'bright', format: 'rgb' });
         let box = new Box(self.scene, X0 - h / 2 + 64, item_x, h, w, item_h, color);
@@ -283,7 +342,7 @@ class Scene extends Component {
       });
 
       // group
-      let group_label = new Label(self.scene, group.title, X0 + LABEL_X, 0, Z0-group_x, "normal small-caps bold 56px arial", "#b0e65a", "#black", 10);
+      let group_label = new Label(self.scene, group.title, X0 + LABEL_X, 0, Z0 - group_x, "normal small-caps bold 56px arial", "#b0e65a", "#black", 10);
       group_x += items_h + group_h;
     });
   }
@@ -292,13 +351,21 @@ class Scene extends Component {
 
   rerender() {
     let self = this;
-    window.requestAnimationFrame(function() { self.rerender(); });
+    window.requestAnimationFrame(function () { self.rerender(); });
+    
+    if(this.state === 'play') {
+      // Bye HUD
+      if (this.spriteC.position.x < window.innerWidth) {
+        this.spriteC.position.x += 16;
+        this.spriteC.position.y -= 1;
+      }
+    }
 
     self.traffic && self.traffic.update();
 
     let delta = this.clock.getDelta();
 
-    this.chickens && this.chickens.forEach(function(chicken) {
+    this.chickens && this.chickens.forEach(function (chicken) {
 
       //let randomness = Math.random();
       //chicken.rotationY = Math.PI / 2 * randomness;//self.targetTheta;
@@ -310,7 +377,7 @@ class Scene extends Component {
         var f = chicken.speed * delta * chicken.scale;
         chicken.group.position.set(chicken.group.position.x + f * Math.cos(self.targetRadian), 20, chicken.group.position.z - f * Math.sin(self.targetRadian));
         chicken.rotationY = self.targetRadian;
-        chicken.group.children.forEach(function(mesh) {
+        chicken.group.children.forEach(function (mesh) {
           mesh.updateAnimation(1000 * delta);
           //mesh.translateX(chicken.speed * delta);
         });
@@ -325,10 +392,10 @@ class Scene extends Component {
       var target = this.chickens[0].group.position.clone();
       this.letCameraFollowTarget(target);
     }
-    
+
     // light
-    if(this.traffic_light) {
-      this.traffic_light.intensity = Math.sin(this.theta+=Math.PI/15) / 2 + 0.5;
+    if (this.traffic_light) {
+      this.traffic_light.intensity = Math.sin(this.theta += Math.PI / 15) / 2 + 0.5;
     }
 
     this.renderer.clear();
@@ -336,6 +403,8 @@ class Scene extends Component {
 
     // render
     this.renderer.render(this.scene, this.camera);
+    this.renderer.clearDepth();
+    this.renderer.render(this.sceneOrtho, this.cameraOrtho);
   }
 
   renderObject() {
@@ -343,8 +412,8 @@ class Scene extends Component {
     self.chickens = [];
 
     this.reference = new LoadModels();
-    this.reference.load().then(function() {
-      new Chicken(-200, 20, 620, Config.SCALE, self.reference, self.scene, self.chickens);
+    this.reference.load().then(function () {
+      new Chicken(-64, 20, 1264, Config.SCALE, self.reference, self.scene, self.chickens);
     });
   }
 
@@ -375,7 +444,7 @@ class Scene extends Component {
     this.zLight = new THREE.DirectionalLight(0x111111, 0.1);
     this.zLight.position.set(0, 0, 1).normalize();
     this.scene.add(this.zLight);
-    
+
     /*
     // for debug traffic_light
     var geometry = new THREE.SphereGeometry( 4, 16, 16 );
@@ -384,7 +453,7 @@ class Scene extends Component {
     this.scene.add( sphere );
     sphere.position.set(-220, 200, 930);
     */
-    
+
     this.theta = 0;
     // PointLight( color, intensity, distance, decay )
     this.traffic_light = new THREE.PointLight(0xFF0000, Math.sin(this.theta), 500);
@@ -416,8 +485,20 @@ class Scene extends Component {
   }
 
   onWindowResize(self) {
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+
     self.camera.aspect = window.innerWidth / window.innerHeight;
     self.camera.updateProjectionMatrix();
     self.renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // HUD
+    if (self.cameraOrtho) {
+      self.cameraOrtho.left = - width / 2;
+      self.cameraOrtho.right = width / 2;
+      self.cameraOrtho.top = height / 2;
+      self.cameraOrtho.bottom = - height / 2;
+      self.cameraOrtho.updateProjectionMatrix();
+    }
   }
 }

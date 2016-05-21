@@ -44,15 +44,17 @@ export default class Chicken {
         this.group.scale.set(this.scale, this.scale, this.scale);
         this.group.position.set(this.position.x, this.position.y, this.position.z);
         this.scene.add(this.group);
+
+        this.rotationY = Math.PI * 3 / 2;
     }
 
     set rotationY(theta) {
         let self = this;
-        self.group.children.forEach(function(model) {
+        self.group.children.forEach(function (model) {
             model.rotation.y = theta;
         });
     }
-    
+
     get rotationY() {
         let self = this;
         return self.group.children[0].rotation.y;
