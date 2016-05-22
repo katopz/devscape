@@ -55,13 +55,13 @@ class Scene extends Component {
 
     this.targetRadian = 0;
 
-/*
-    this.events = {
-      [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown,
-      [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
-      [TOUCH ? 'onTouchEnd' : 'onMouseUp']: ::this.mouseUp
-    };
-    */
+    /*
+        this.events = {
+          [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown,
+          [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
+          [TOUCH ? 'onTouchEnd' : 'onMouseUp']: ::this.mouseUp
+        };
+        */
 
     let self = this;
     window.oncontextmenu = function (event) {
@@ -81,10 +81,10 @@ class Scene extends Component {
 
       // First click
       if (self.state === 'wait') {
-        self.state = 'play';
+        self.state = 'intro';
       }
     }
-    
+
     var mousemove = function (e) {
       console.log('mouseMove:' + coords(e).x);
       e.preventDefault();
@@ -94,20 +94,20 @@ class Scene extends Component {
 
       self.calculateTarget(self, coords(e));
     }
-    
+
     var mouseup = function (e) {
       console.log('mouseUp:' + coords(e));
       e.preventDefault();
 
       self.mouse_status = 'up';
     }
-    
+
     document.addEventListener('mousedown', mousedown, false);
     document.addEventListener('touchstart', mousedown, false);
-    
+
     document.addEventListener('mousemove', mousemove, false);
     document.addEventListener('touchmove', mousemove, false);
-    
+
     document.addEventListener('touchend', mouseup, false);
     document.addEventListener('mouseup', mouseup, false);
   }
@@ -239,17 +239,19 @@ class Scene extends Component {
       var th = material.map.image.height;
 
       // media query
-      if (width <= 414) {
-        tw = tw / 1.75;
-        th = th / 1.75;
-      } else if (width <= 320) {
+      let logo_y = 120;
+      if  (width <= 320) {
         tw = tw / 2;
         th = th / 2;
+      } else if (width <= 414) {
+        tw = tw / 1.75;
+        th = th / 1.75;
+        logo_y = 200;
       }
 
       self.spriteC.scale.set(tw, th, 1);
       self.sceneOrtho.add(self.spriteC);
-      self.spriteC.position.set(0, 200, 1); // center
+      self.spriteC.position.set(0, logo_y, 1); // center
     });
   }
 
@@ -346,11 +348,13 @@ class Scene extends Component {
     let self = this;
     window.requestAnimationFrame(function () { self.rerender(); });
 
-    if (this.state === 'play') {
+    if (this.state === 'intro') {
       // Bye HUD
       if (this.spriteC.position.x < window.innerWidth) {
         this.spriteC.position.x += 16;
         this.spriteC.position.y -= 1;
+      } else {
+        this.state = 'play'
       }
     }
 
@@ -396,8 +400,11 @@ class Scene extends Component {
 
     // render
     this.renderer.render(this.scene, this.camera);
-    this.renderer.clearDepth();
-    this.renderer.render(this.sceneOrtho, this.cameraOrtho);
+
+    if (this.state !== 'play') {
+      this.renderer.clearDepth();
+      this.renderer.render(this.sceneOrtho, this.cameraOrtho);
+    }
   }
 
   renderObject() {
@@ -486,12 +493,10 @@ class Scene extends Component {
     self.renderer.setSize(window.innerWidth, window.innerHeight);
 
     // HUD
-    if (self.cameraOrtho) {
-      self.cameraOrtho.left = - width / 2;
-      self.cameraOrtho.right = width / 2;
-      self.cameraOrtho.top = height / 2;
-      self.cameraOrtho.bottom = - height / 2;
-      self.cameraOrtho.updateProjectionMatrix();
-    }
+    self.cameraOrtho.left = - width / 2;
+    self.cameraOrtho.right = width / 2;
+    self.cameraOrtho.top = height / 2;
+    self.cameraOrtho.bottom = - height / 2;
+    self.cameraOrtho.updateProjectionMatrix();
   }
 }
