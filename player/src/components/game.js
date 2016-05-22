@@ -46,7 +46,7 @@ export default class Game extends Component {
 class Scene extends Component {
   constructor() {
     super();
-    
+
     this.state = 'wait';
 
     this.raycaster = new THREE.Raycaster();
@@ -55,18 +55,61 @@ class Scene extends Component {
 
     this.targetRadian = 0;
 
+/*
     this.events = {
       [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown,
       [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
       [TOUCH ? 'onTouchEnd' : 'onMouseUp']: ::this.mouseUp
     };
+    */
 
+    let self = this;
     window.oncontextmenu = function (event) {
       console.log('oncontextmenu');
       event.preventDefault();
       event.stopPropagation();
+
       return false;
     };
+
+    var mousedown = function (e) {
+      console.log('mousedown:' + coords(e).x);
+      e.preventDefault();
+
+      self.calculateTarget(self, coords(e));
+      self.mouse_status = 'down';
+
+      // First click
+      if (self.state === 'wait') {
+        self.state = 'play';
+      }
+    }
+    
+    var mousemove = function (e) {
+      console.log('mouseMove:' + coords(e).x);
+      e.preventDefault();
+
+      if (self.mouse_status !== 'down')
+        return;
+
+      self.calculateTarget(self, coords(e));
+    }
+    
+    var mouseup = function (e) {
+      console.log('mouseUp:' + coords(e));
+      e.preventDefault();
+
+      self.mouse_status = 'up';
+    }
+    
+    document.addEventListener('mousedown', mousedown, false);
+    document.addEventListener('touchstart', mousedown, false);
+    
+    document.addEventListener('mousemove', mousemove, false);
+    document.addEventListener('touchmove', mousemove, false);
+    
+    document.addEventListener('touchend', mouseup, false);
+    document.addEventListener('mouseup', mouseup, false);
   }
 
   shouldComponentUpdate() {
@@ -77,67 +120,17 @@ class Scene extends Component {
     if (this.base) this.update();
   }
 
-  mouseDown(e) {
-    e.preventDefault();
+  calculateTarget(self, coords) {
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
-    //this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-    //this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
+    self.mouse.x = (coords.x / window.innerWidth) * 2 - 1;
+    self.mouse.y = - (coords.y / window.innerHeight) * 2 + 1;
 
-    //console.log('*scene.mouseDown : ' + this.mouse.x);
-
-    // update the picking ray with the camera and mouse position	
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-    // calculate objects intersecting the picking ray
-    var intersects = this.raycaster.intersectObjects(this.scene.children);
-    //console.log(intersects.length);
-    for (var i = 0; i < intersects.length; i++) {
-      //intersects[i].object.material.color.set(0xff0000);
-      console.log(intersects[0].point.x, intersects[0].point.z);
-    }
-
-    /*
-    if ( intersects.length > 0 ) {
-      console.log( intersects[0].object.name);
-        intersects[0].object.callback();
-    }
-    */
-
-    this.calculateTarget(e);
-    this.mouse_status = 'down';
-    
-    // First click
-    if(this.state === 'wait') {
-      this.state = 'play';
-    }
-  }
-
-  mouseMove(e) {
-    e.preventDefault();
-
-    if (this.mouse_status !== 'down')
-      return;
-
-    this.calculateTarget(e);
-  }
-
-  mouseUp(e) {
-    e.preventDefault();
-
-    this.mouse_status = 'up';
-  }
-
-  calculateTarget(e) {
-    // calculate mouse position in normalized device coordinates
-    // (-1 to +1) for both components
-    this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-    this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
-
-    let radian = Math.atan2(this.mouse.y, this.mouse.x);
+    let radian = Math.atan2(self.mouse.y, self.mouse.x);
     //let theta = radian * 180 / Math.PI;
     //this.targetTheta = Math.floor(theta / 90) * 90;
     //this.targetRadian = this.targetTheta * Math.PI / 180;
-    this.targetRadian = radian;
+    self.targetRadian = radian;
   }
 
   //@debounce
@@ -352,8 +345,8 @@ class Scene extends Component {
   rerender() {
     let self = this;
     window.requestAnimationFrame(function () { self.rerender(); });
-    
-    if(this.state === 'play') {
+
+    if (this.state === 'play') {
       // Bye HUD
       if (this.spriteC.position.x < window.innerWidth) {
         this.spriteC.position.x += 16;
