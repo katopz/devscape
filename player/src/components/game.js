@@ -181,7 +181,7 @@ class Scene extends Component {
     this.camera = new THREE.PerspectiveCamera(
       10,         // FOV
       window.innerWidth / window.innerHeight,  // Aspect
-      10,        // Near
+      100,        // Near
       10000       // Far
     );
 
