@@ -9,7 +9,8 @@
     "prestart": "npm run build",
     "build": "cross-env NODE_ENV=production webpack -p --progress",
     "prebuild": "rm -rf build && mkdir build",
-    "test": "eslint src tests/**/*.js"
+    "test": "eslint src tests/**/*.js",
+    "deploy": "gh-pages -d build"
   },
   "keywords": [
     "preact",
@@ -40,6 +41,7 @@
     "eslint": "^2.8.0",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
+    "gh-pages": "^0.11.0",
     "html-webpack-plugin": "^2.10.0",
     "json-loader": "^0.5.4",
     "less": "^2.6.1",

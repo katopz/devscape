@@ -46,8 +46,9 @@ export default class Game extends Component {
 class Scene extends Component {
   constructor() {
     super();
-    
+
     this.state = 'wait';
+    this.mode = 'manual';
 
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
@@ -55,18 +56,65 @@ class Scene extends Component {
 
     this.targetRadian = 0;
 
-    this.events = {
-      [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown,
-      [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
-      [TOUCH ? 'onTouchEnd' : 'onMouseUp']: ::this.mouseUp
-    };
+    /*
+        this.events = {
+          [TOUCH ? 'onTouchStart' : 'onMouseDown']: ::this.mouseDown,
+          [TOUCH ? 'onTouchMove' : 'onMouseMove']: ::this.mouseMove,
+          [TOUCH ? 'onTouchEnd' : 'onMouseUp']: ::this.mouseUp
+        };
+        */
 
+    let self = this;
     window.oncontextmenu = function (event) {
       console.log('oncontextmenu');
       event.preventDefault();
       event.stopPropagation();
+
       return false;
     };
+
+    var mousedown = function (e) {
+      console.log('mousedown:' + coords(e).x);
+      e.preventDefault();
+
+      self.calculateTarget(self, coords(e));
+      self.mouse_status = 'down';
+
+      // First click
+      if (self.state === 'wait') {
+        self.state = 'intro';
+      }
+
+      self.mode = 'manual';
+    }
+
+    var mousemove = function (e) {
+      console.log('mouseMove:' + coords(e).x);
+      e.preventDefault();
+
+      if (self.mouse_status !== 'down')
+        return;
+
+      self.calculateTarget(self, coords(e));
+    }
+
+    var mouseup = function (e) {
+      console.log('mouseUp:' + coords(e));
+      e.preventDefault();
+
+      self.mouse_status = 'up';
+
+      self.mode = 'autoplay';
+    }
+
+    document.addEventListener('mousedown', mousedown, false);
+    document.addEventListener('touchstart', mousedown, false);
+
+    document.addEventListener('mousemove', mousemove, false);
+    document.addEventListener('touchmove', mousemove, false);
+
+    document.addEventListener('touchend', mouseup, false);
+    document.addEventListener('mouseup', mouseup, false);
   }
 
   shouldComponentUpdate() {
@@ -77,67 +125,17 @@ class Scene extends Component {
     if (this.base) this.update();
   }
 
-  mouseDown(e) {
-    e.preventDefault();
+  calculateTarget(self, coords) {
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
-    //this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-    //this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
+    self.mouse.x = (coords.x / window.innerWidth) * 2 - 1;
+    self.mouse.y = - (coords.y / window.innerHeight) * 2 + 1;
 
-    //console.log('*scene.mouseDown : ' + this.mouse.x);
-
-    // update the picking ray with the camera and mouse position	
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-    // calculate objects intersecting the picking ray
-    var intersects = this.raycaster.intersectObjects(this.scene.children);
-    //console.log(intersects.length);
-    for (var i = 0; i < intersects.length; i++) {
-      //intersects[i].object.material.color.set(0xff0000);
-      console.log(intersects[0].point.x, intersects[0].point.z);
-    }
-
-    /*
-    if ( intersects.length > 0 ) {
-      console.log( intersects[0].object.name);
-        intersects[0].object.callback();
-    }
-    */
-
-    this.calculateTarget(e);
-    this.mouse_status = 'down';
-    
-    // First click
-    if(this.state === 'wait') {
-      this.state = 'play';
-    }
-  }
-
-  mouseMove(e) {
-    e.preventDefault();
-
-    if (this.mouse_status !== 'down')
-      return;
-
-    this.calculateTarget(e);
-  }
-
-  mouseUp(e) {
-    e.preventDefault();
-
-    this.mouse_status = 'up';
-  }
-
-  calculateTarget(e) {
-    // calculate mouse position in normalized device coordinates
-    // (-1 to +1) for both components
-    this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-    this.mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
-
-    let radian = Math.atan2(this.mouse.y, this.mouse.x);
+    let radian = Math.atan2(self.mouse.y, self.mouse.x);
     //let theta = radian * 180 / Math.PI;
     //this.targetTheta = Math.floor(theta / 90) * 90;
     //this.targetRadian = this.targetTheta * Math.PI / 180;
-    this.targetRadian = radian;
+    self.targetRadian = radian;
   }
 
   //@debounce
@@ -188,7 +186,7 @@ class Scene extends Component {
     this.camera = new THREE.PerspectiveCamera(
       10,         // FOV
       window.innerWidth / window.innerHeight,  // Aspect
-      10,        // Near
+      100,        // Near
       10000       // Far
     );
 
@@ -217,7 +215,7 @@ class Scene extends Component {
     new Forest(this.scene, 640, 640, 10);
     this.traffic = new Traffic(this.scene);
 
-    this.animate();
+    //this.animate();
 
     // Logo
     this.logo = new Logo(this.scene);
@@ -227,6 +225,36 @@ class Scene extends Component {
     window.addEventListener('resize', function () {
       self.onWindowResize(self);
     }, false);
+
+    // Wait 3 sec for autoplay
+    setTimeout(() => this.autoplay(this), 3000);
+  }
+
+  autoplay(self) {
+    self.state = 'intro';
+    self.mode = 'autoplay';
+
+    // Go wild
+    this.walkabout(this);
+  }
+
+  walkabout(self) {
+    self.AI_targetRadian = 2 * Math.PI * Math.random();
+
+    // Retarget every 3 sec
+    setTimeout(() => self.walkabout(self), 3000);
+  }
+
+  recharge(self, chicken) {
+    // Wake up after charged
+    chicken.mp += Math.random();
+    if (chicken.mp >= 100) {
+      self.wakeup(self)
+    }
+  }
+
+  wakeup(self) {
+    self.mode = 'autoplay'
   }
 
   setupHUD() {
@@ -246,17 +274,19 @@ class Scene extends Component {
       var th = material.map.image.height;
 
       // media query
-      if (width <= 414) {
-        tw = tw / 1.75;
-        th = th / 1.75;
-      } else if (width <= 320) {
+      let logo_y = 120;
+      if (width <= 320) {
         tw = tw / 2;
         th = th / 2;
+      } else if (width <= 414) {
+        tw = tw / 1.75;
+        th = th / 1.75;
+        logo_y = 200;
       }
 
       self.spriteC.scale.set(tw, th, 1);
       self.sceneOrtho.add(self.spriteC);
-      self.spriteC.position.set(0, 200, 1); // center
+      self.spriteC.position.set(0, logo_y, 1); // center
     });
   }
 
@@ -352,37 +382,85 @@ class Scene extends Component {
   rerender() {
     let self = this;
     window.requestAnimationFrame(function () { self.rerender(); });
-    
-    if(this.state === 'play') {
+
+    if (this.state === 'intro') {
       // Bye HUD
       if (this.spriteC.position.x < window.innerWidth) {
         this.spriteC.position.x += 16;
         this.spriteC.position.y -= 1;
+      } else {
+        this.state = 'play'
       }
     }
 
     self.traffic && self.traffic.update();
 
-    let delta = this.clock.getDelta();
+    let delta = self.clock.getDelta();
 
-    this.chickens && this.chickens.forEach(function (chicken) {
+    if (self.chickens) {
 
-      //let randomness = Math.random();
-      //chicken.rotationY = Math.PI / 2 * randomness;//self.targetTheta;
-      if (self.mouse_status === 'down') {
-
-        // console.log("targetRadian : " + self.targetRadian);        
-        //chicken.rotationY = self.targetRadian;
-        chicken.rotationY = 0;
-        var f = chicken.speed * delta * chicken.scale;
-        chicken.group.position.set(chicken.group.position.x + f * Math.cos(self.targetRadian), 20, chicken.group.position.z - f * Math.sin(self.targetRadian));
-        chicken.rotationY = self.targetRadian;
-        chicken.group.children.forEach(function (mesh) {
-          mesh.updateAnimation(1000 * delta);
-          //mesh.translateX(chicken.speed * delta);
-        });
+      // autoplay?
+      if (self.mode === 'autoplay') {
+        self.targetRadian = self.AI_targetRadian;
       }
-    });
+
+      self.chickens.forEach(function (chicken) {
+
+        switch (self.mode) {
+          case 'charge':
+            self.recharge(self, chicken)
+            break;
+          case 'manual':
+          case 'autoplay':
+            if (self.mouse_status === 'down' || self.mode === 'autoplay') {
+              var f = chicken.speed * delta * chicken.scale;
+
+              // Out bound?
+              var isGoodToGo = false;
+              let dolly_position = chicken.group.position.clone();
+              dolly_position.set(dolly_position.x + f * Math.cos(self.targetRadian), 20, dolly_position.z - f * Math.sin(self.targetRadian));
+
+              // First try
+              isGoodToGo = !Forest.isOB(dolly_position.x, dolly_position.z);
+
+              if (self.mode === 'autoplay') {
+                var try_count = 0;
+                while (!isGoodToGo && try_count < 16) {
+                  // try again
+                  self.targetRadian = self.AI_targetRadian = 2 * Math.PI * Math.random();
+                  dolly_position = chicken.group.position.clone();
+                  dolly_position.set(dolly_position.x + f * Math.cos(self.targetRadian), 20, dolly_position.z - f * Math.sin(self.targetRadian));
+
+                  // Still OB?
+                  isGoodToGo = !Forest.isOB(dolly_position.x, dolly_position.z);
+                  try_count++;
+                }
+              }
+
+              // Good to go
+              if (isGoodToGo) {
+                if (self.mode === 'autoplay') {
+                  chicken.mp -= 0.1;
+
+                  // No more power
+                  if (chicken.mp <= 0) {
+                    isGoodToGo = false;
+                    self.mode = 'charge';
+                  }
+                }
+
+                chicken.group.position.set(dolly_position.x, dolly_position.y, dolly_position.z);
+              }
+
+              chicken.rotationY = self.targetRadian;
+              chicken.group.children.forEach(function (mesh) {
+                mesh.updateAnimation(1000 * delta);
+              });
+            }
+            break;
+        }
+      });
+    }
 
     // follow camera
     if (this.chickens && this.chickens[0] && this.chickens[0].group.children[0]) {
@@ -403,8 +481,11 @@ class Scene extends Component {
 
     // render
     this.renderer.render(this.scene, this.camera);
-    this.renderer.clearDepth();
-    this.renderer.render(this.sceneOrtho, this.cameraOrtho);
+
+    if (this.state !== 'play') {
+      this.renderer.clearDepth();
+      this.renderer.render(this.sceneOrtho, this.cameraOrtho);
+    }
   }
 
   renderObject() {
@@ -493,12 +574,10 @@ class Scene extends Component {
     self.renderer.setSize(window.innerWidth, window.innerHeight);
 
     // HUD
-    if (self.cameraOrtho) {
-      self.cameraOrtho.left = - width / 2;
-      self.cameraOrtho.right = width / 2;
-      self.cameraOrtho.top = height / 2;
-      self.cameraOrtho.bottom = - height / 2;
-      self.cameraOrtho.updateProjectionMatrix();
-    }
+    self.cameraOrtho.left = - width / 2;
+    self.cameraOrtho.right = width / 2;
+    self.cameraOrtho.top = height / 2;
+    self.cameraOrtho.bottom = - height / 2;
+    self.cameraOrtho.updateProjectionMatrix();
   }
 }

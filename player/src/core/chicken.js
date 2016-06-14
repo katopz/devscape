@@ -11,9 +11,10 @@ export default class Chicken {
         this.speed = 12;
         this.rotation = 0;
         this.chickens = chickens;
-        this.body = reference.body.clone()
-        this.foot1 = reference.foot1.clone()
-        this.foot2 = reference.foot2.clone()
+        this.body = reference.body.clone();
+        this.foot1 = reference.foot1.clone();
+        this.foot2 = reference.foot2.clone();
+        this._mp = 100;
         /*
         setInterval(() => {
             let randomness = Math.random();
@@ -58,6 +59,19 @@ export default class Chicken {
     get rotationY() {
         let self = this;
         return self.group.children[0].rotation.y;
+    }
+
+    set mp(value) {
+        this._mp = value;
+
+        if(this._mp < 0)
+        {
+            this._mp = 0;
+        }
+    }
+
+    get mp() {
+        return this._mp;
     }
 
     update() {
