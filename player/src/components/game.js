@@ -48,6 +48,7 @@ class Scene extends Component {
     super();
 
     this.state = 'wait';
+    this.mode = 'manual';
 
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
@@ -83,6 +84,8 @@ class Scene extends Component {
       if (self.state === 'wait') {
         self.state = 'intro';
       }
+
+      self.mode = 'manual';
     }
 
     var mousemove = function (e) {
@@ -100,6 +103,8 @@ class Scene extends Component {
       e.preventDefault();
 
       self.mouse_status = 'up';
+
+      self.mode = 'autoplay';
     }
 
     document.addEventListener('mousedown', mousedown, false);
@@ -210,7 +215,7 @@ class Scene extends Component {
     new Forest(this.scene, 640, 640, 10);
     this.traffic = new Traffic(this.scene);
 
-    this.animate();
+    //this.animate();
 
     // Logo
     this.logo = new Logo(this.scene);
@@ -220,6 +225,36 @@ class Scene extends Component {
     window.addEventListener('resize', function () {
       self.onWindowResize(self);
     }, false);
+
+    // Wait 3 sec for autoplay
+    setTimeout(() => this.autoplay(this), 3000);
+  }
+
+  autoplay(self) {
+    self.state = 'intro';
+    self.mode = 'autoplay';
+
+    // Go wild
+    this.walkabout(this);
+  }
+
+  walkabout(self) {
+    self.AI_targetRadian = 2 * Math.PI * Math.random();
+
+    // Retarget every 3 sec
+    setTimeout(() => self.walkabout(self), 3000);
+  }
+
+  recharge(self, chicken) {
+    // Wake up after charged
+    chicken.mp += Math.random();
+    if (chicken.mp >= 100) {
+      self.wakeup(self)
+    }
+  }
+
+  wakeup(self) {
+    self.mode = 'autoplay'
   }
 
   setupHUD() {
@@ -240,7 +275,7 @@ class Scene extends Component {
 
       // media query
       let logo_y = 120;
-      if  (width <= 320) {
+      if (width <= 320) {
         tw = tw / 2;
         th = th / 2;
       } else if (width <= 414) {
@@ -360,26 +395,72 @@ class Scene extends Component {
 
     self.traffic && self.traffic.update();
 
-    let delta = this.clock.getDelta();
+    let delta = self.clock.getDelta();
 
-    this.chickens && this.chickens.forEach(function (chicken) {
+    if (self.chickens) {
 
-      //let randomness = Math.random();
-      //chicken.rotationY = Math.PI / 2 * randomness;//self.targetTheta;
-      if (self.mouse_status === 'down') {
-
-        // console.log("targetRadian : " + self.targetRadian);        
-        //chicken.rotationY = self.targetRadian;
-        chicken.rotationY = 0;
-        var f = chicken.speed * delta * chicken.scale;
-        chicken.group.position.set(chicken.group.position.x + f * Math.cos(self.targetRadian), 20, chicken.group.position.z - f * Math.sin(self.targetRadian));
-        chicken.rotationY = self.targetRadian;
-        chicken.group.children.forEach(function (mesh) {
-          mesh.updateAnimation(1000 * delta);
-          //mesh.translateX(chicken.speed * delta);
-        });
+      // autoplay?
+      if (self.mode === 'autoplay') {
+        self.targetRadian = self.AI_targetRadian;
       }
-    });
+
+      self.chickens.forEach(function (chicken) {
+
+        switch (self.mode) {
+          case 'charge':
+            self.recharge(self, chicken)
+            break;
+          case 'manual':
+          case 'autoplay':
+            if (self.mouse_status === 'down' || self.mode === 'autoplay') {
+              var f = chicken.speed * delta * chicken.scale;
+
+              // Out bound?
+              var isGoodToGo = false;
+              let dolly_position = chicken.group.position.clone();
+              dolly_position.set(dolly_position.x + f * Math.cos(self.targetRadian), 20, dolly_position.z - f * Math.sin(self.targetRadian));
+
+              // First try
+              isGoodToGo = !Forest.isOB(dolly_position.x, dolly_position.z);
+
+              if (self.mode === 'autoplay') {
+                var try_count = 0;
+                while (!isGoodToGo && try_count < 16) {
+                  // try again
+                  self.targetRadian = self.AI_targetRadian = 2 * Math.PI * Math.random();
+                  dolly_position = chicken.group.position.clone();
+                  dolly_position.set(dolly_position.x + f * Math.cos(self.targetRadian), 20, dolly_position.z - f * Math.sin(self.targetRadian));
+
+                  // Still OB?
+                  isGoodToGo = !Forest.isOB(dolly_position.x, dolly_position.z);
+                  try_count++;
+                }
+              }
+
+              // Good to go
+              if (isGoodToGo) {
+                if (self.mode === 'autoplay') {
+                  chicken.mp -= 0.1;
+
+                  // No more power
+                  if (chicken.mp <= 0) {
+                    isGoodToGo = false;
+                    self.mode = 'charge';
+                  }
+                }
+
+                chicken.group.position.set(dolly_position.x, dolly_position.y, dolly_position.z);
+              }
+
+              chicken.rotationY = self.targetRadian;
+              chicken.group.children.forEach(function (mesh) {
+                mesh.updateAnimation(1000 * delta);
+              });
+            }
+            break;
+        }
+      });
+    }
 
     // follow camera
     if (this.chickens && this.chickens[0] && this.chickens[0].group.children[0]) {
