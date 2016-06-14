@@ -8,12 +8,13 @@ export default class Chicken {
         this.position = new THREE.Vector3(x, y, z);
         this.group = new THREE.Group();
         this.scene = scene;
-        this.speed = 3;
+        this.speed = 12;
         this.rotation = 0;
         this.chickens = chickens;
-        this.body = reference.body.clone()
-        this.foot1 = reference.foot1.clone()
-        this.foot2 = reference.foot2.clone()
+        this.body = reference.body.clone();
+        this.foot1 = reference.foot1.clone();
+        this.foot2 = reference.foot2.clone();
+        this._mp = 100;
         /*
         setInterval(() => {
             let randomness = Math.random();
@@ -44,14 +45,46 @@ export default class Chicken {
         this.group.scale.set(this.scale, this.scale, this.scale);
         this.group.position.set(this.position.x, this.position.y, this.position.z);
         this.scene.add(this.group);
+
+        this.rotationY = Math.PI * 3 / 2;
+    }
+
+    set rotationY(theta) {
+        let self = this;
+        self.group.children.forEach(function (model) {
+            model.rotation.y = theta;
+        });
+    }
+
+    get rotationY() {
+        let self = this;
+        return self.group.children[0].rotation.y;
+    }
+
+    set mp(value) {
+        this._mp = value;
+
+        if(this._mp < 0)
+        {
+            this._mp = 0;
+        }
+    }
+
+    get mp() {
+        return this._mp;
     }
 
     update() {
-        let self = this;
+
+    }
+
+    /*
+    update() {
         let randomness = Math.random();
         self.group.children.forEach(function(model) {
             console.log("update");
             model.rotation.y += Math.PI / 2 * randomness;
         });
     }
+    */
 }

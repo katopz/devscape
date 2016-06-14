@@ -3,13 +3,14 @@
   "version": "0.0.1",
   "description": "When DevOps meet Crossy Road <3",
   "scripts": {
-    "browser": "opener http://localhost:8080/",
-    "dev": "npm run browser && cross-env NODE_ENV=development webpack-dev-server --inline --hot --progress",
+    "browser": "opener http://localhost:3000/",
+    "dev": "npm run browser && cross-env NODE_ENV=development webpack-dev-server --inline --hot --progress --port 3000",
     "start": "superstatic build -p ${PORT:-8080} --host 0.0.0.0 --gzip -c '{\"rewrites\": [{\"source\":\"**\",\"destination\":\"index.html\"}],\"headers\":[{\"source\":\"**\",\"headers\":[{\"key\":\"Cache-Control\",\"value\":\"max-age=86400\"}]}]}'",
     "prestart": "npm run build",
     "build": "cross-env NODE_ENV=production webpack -p --progress",
     "prebuild": "rm -rf build && mkdir build",
-    "test": "eslint src tests/**/*.js"
+    "test": "eslint src tests/**/*.js",
+    "deploy": "gh-pages -d build"
   },
   "keywords": [
     "preact",
@@ -37,9 +38,10 @@
     "core-js": "^2.2.0",
     "cross-env": "^1.0.7",
     "css-loader": "^0.23.1",
-    "eslint": "^2.4.0",
+    "eslint": "^2.8.0",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
+    "gh-pages": "^0.11.0",
     "html-webpack-plugin": "^2.10.0",
     "json-loader": "^0.5.4",
     "less": "^2.6.1",
@@ -58,6 +60,7 @@
   "dependencies": {
     "decko": "^1.1.3",
     "octokat": "^0.4.17",
+    "papergirl": "^0.6.1",
     "preact": "^4.4.0",
     "preact-compat": "^1.6.1",
     "preact-router": "^1.3.0",
